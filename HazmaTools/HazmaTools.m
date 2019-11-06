@@ -275,7 +275,7 @@ Map[Simplify,ampFC]
 ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Computing Squared Amplitudes*)
 
 
@@ -400,7 +400,7 @@ msqrd
 ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Compute 2->2 Cross Sections*)
 
 
@@ -553,7 +553,7 @@ ScalarMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{new
 	E1=(Q^2+m1^2-m2^2)/(2Q);
 	tintegral=Integrate[msqrd,t,GenerateConditions->False];
 	dndE=Simplify[((tintegral/.tbounds[[1]])-(tintegral/.tbounds[[2]])),Assumptions->{Q>0,Q>m1+m2,Q>m3+m4}];
-	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^2) * 1/\[Sigma]0;
+	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^3) * 1/\[Sigma]0;
 	Simplify[
 		ReplaceAll[
 			preFactor*dndE,
@@ -620,26 +620,37 @@ VectorMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{new
 	FeynCalc`SP[p4,p4]=m4^2;
 	FeynCalc`SP[k,k]=0;
 	
+	(* strip off polarization vectors *)
 	ampIS=ReplaceAll[ampIS,{
 		FeynCalc`DiracGamma[FeynCalc`Momentum[FeynCalc`Polarization[P,-I]]]:>FeynCalc`GA[\[Mu]],
 		FeynCalc`Pair[a__FeynCalc`Momentum,FeynCalc`Momentum[FeynCalc`Polarization[P, I]]]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]],
 		FeynCalc`Pair[FeynCalc`Momentum[FeynCalc`Polarization[P, I]],a__FeynCalc`Momentum]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]]}
 		];
+	(* square amplitude and replace mu with new Lorentz index*)
 	L\[Mu]\[Nu]=ampIS*ReplaceAll[FeynCalc`ComplexConjugate[ampIS],\[Mu]->\[Nu]];
+	(* average over initial state fermions spins *)
 	L\[Mu]\[Nu]=ReplaceAll[FeynCalc`FermionSpinSum[L\[Mu]\[Nu],FeynCalc`ExtraFactor->1/4],FeynCalc`DiracTrace->FeynCalc`TR];
+	(* Compute L using L\[Mu]\[Nu] = (P^\[Mu]P^\[Nu]-g^\[Mu]\[Nu]P^2)L => L = -g^\[Mu]\[Nu]Subscript[L, \[Mu]\[Nu]]/3Q^2 *)
 	L=Simplify[FeynCalc`Contract[L\[Mu]\[Nu]*FeynCalc`MT[\[Mu],\[Nu]]]]/(3Q^2);
 	
 	(* Final state Integrate[M(V\[Rule]finalstate)^2/4,phasespace] *)
+	
+	(* strip off polarization vectors *)
 	ampFS=ReplaceAll[ampFS,{
 		FeynCalc`DiracGamma[FeynCalc`Momentum[FeynCalc`Polarization[P,I]]]:>FeynCalc`GA[\[Mu]],
 		FeynCalc`Pair[a__FeynCalc`Momentum,FeynCalc`Momentum[FeynCalc`Polarization[P, I]]]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]],
 		FeynCalc`Pair[FeynCalc`Momentum[FeynCalc`Polarization[P, I]],a__FeynCalc`Momentum]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]]}
 		];
+	(* square amplitude and replace mu with new Lorentz index*)
 	X\[Mu]\[Nu]=ampFS*ReplaceAll[FeynCalc`ComplexConjugate[ampFS],\[Mu]->\[Nu]];
+	(* sum over final state fermions spins *)
 	X\[Mu]\[Nu]=ReplaceAll[FeynCalc`FermionSpinSum[X\[Mu]\[Nu]],FeynCalc`DiracTrace->FeynCalc`TR];
+	(* sum over final state photon polarizations *)
 	X\[Mu]\[Nu]=FeynCalc`DoPolarizationSums[X\[Mu]\[Nu],k,0];
+	(* Compute X using X\[Mu]\[Nu] = (P^\[Mu]P^\[Nu]-g^\[Mu]\[Nu]P^2)X => X = -g^\[Mu]\[Nu]Subscript[X, \[Mu]\[Nu]]/3Q^2 *)
 	X=Simplify[FeynCalc`Contract[X\[Mu]\[Nu]*FeynCalc`MT[\[Mu],\[Nu]]]]/(3Q^2);
 	
+	(* Compute M^2 = L\[Mu]\[Nu]X\[Mu]\[Nu] = 3Q^2 X L and add vector propagator *)
 	msqrd=X*L (3*Q^4)/ ((Q^2-Global`mv^2)^2+(Global`mv*Global`widthv)^2);
 	
 	(* Set the Mandelstam variables *)
@@ -654,10 +665,10 @@ VectorMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{new
 	E1=(Q^2+m1^2-m2^2)/(2Q);
 	tintegral=Integrate[msqrd,t,GenerateConditions->False];
 	dndE=Simplify[((tintegral/.tbounds[[1]])-(tintegral/.tbounds[[2]])),Assumptions->{Q>0,Q>m1+m2,Q>m3+m4}];
-	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^2)*1/\[Sigma]0;
+	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^3)*1/\[Sigma]0;
 	Simplify[
 		ReplaceAll[
-			preFactor*dndE,
+			(-1)preFactor*dndE,
 			{s->Q^2(1 - 2 Global`E\[Gamma] / Q),Global`qe->Sqrt[4\[Pi] Global`\[Alpha]em]}],
 		Assumptions->{Q>0, Q-(m3+m4)^2/Q > 2 * Global`E\[Gamma] > 0,m1>0,m2>0,m3>0,m4>0}]
 ];
