@@ -60,14 +60,14 @@ SubstituteMasses::usage"If true, masses are subsituted, otherwise the are left a
 Begin["`Private`"]
 
 
-Print["MeV-DM - Scalar Mediator: version 1.0"];
+Print["MeV-DM - Scalar Mediator: version 0.1"];
 Print["by Adam Coogan and Logan A. Morrison"];
 
 
 $HazmaModel="scalar";
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*States*)
 
 
@@ -231,6 +231,7 @@ Options[HazmaCreateAmplitude]={
 
 HazmaCreateAmplitude[inStates_,outStates_,OptionsPattern[]] := Module[{tops, ampFA,ampFC, diagrams},
 
+FeynCalc`ClearScalarProducts[];
 (* create the topologies based on input states *)
 diagrams=HazmaGenerateDiagrams[inStates,outStates,
 	LoopNumber->OptionValue[LoopNumber],
@@ -399,7 +400,7 @@ msqrd
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Compute 2->2 Cross Sections*)
 
 
@@ -431,7 +432,7 @@ Options[HazmaComputeCrossSection22]={
 	Truncated->False
 };
 
-HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[{msqrd,inMomenta,outMomenta,m1,m2,m3,m4,s,t,u,E1,E3,z},
+HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[{msqrd,inMomenta,outMomenta,m1,m2,m3,m4,s,t,u,E1,E3,z,p1,p3},
 	ClearScalarProducts[];
 	(* Create the amplitude *)
 	msqrd=HazmaCreateAmplitudeSquared[
@@ -457,10 +458,9 @@ HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[
 		PreFactor->OptionValue[PreFactor],
 		Truncated->OptionValue[Truncated]
 	];
-	FeynCalc`ClearScalarProducts[];
 	(* determine incoming/outgoing momenta *)
-	inMomenta=OptionValue[HazmaCreateAmplitudeSquared,IncomingMomenta];
-	outMomenta=OptionValue[HazmaCreateAmplitudeSquared,OutgoingMomenta];
+	inMomenta=OptionValue[IncomingMomenta];
+	outMomenta=OptionValue[OutgoingMomenta];
 	(* Fix momenta *)
 	For[i=Length[inMomenta]+1,i<=Length[inStates],i++,
 		AppendTo[inMomenta,ToExpression["InMom"<>ToString[i]]]
@@ -477,13 +477,15 @@ HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[
 	FeynCalc`SetMandelstam[s,t,u,inMomenta[[1]],inMomenta[[2]],-outMomenta[[1]],-outMomenta[[2]],m1,m2,m3,m4];
 	msqrd=Simplify[msqrd];
 
-	msqrd=msqrd/.{u->m1^2+m2^2+m3^2+m4^2-s-t};
+	msqrd=ReplaceAll[msqrd,{u->m1^2+m2^2+m3^2+m4^2-s-t}];
 
 	E1=(s+m1^2-m2^2)/(2Sqrt[s]);
 	E3=(s+m3^2-m4^2)/(2Sqrt[s]);
-	msqrd=Simplify[msqrd/.{t->m1^2+m3^2-2(E1*E3-z Sqrt[E1^2-m1^2] Sqrt[E3^2-m3^2])}];
+	p1=Sqrt[E1^2-m1^2];
+	p3=Sqrt[E3^2-m3^2];
+	msqrd=Simplify[ReplaceAll[msqrd,{t->m1^2+m3^2-2(E1*E3-z p1*p3)}]];
 
-	(2\[Pi])/(64\[Pi]^2 Q^2) (Sqrt[E3^2-m3^2]/Sqrt[E1^2-m1^2])Integrate[msqrd,{z,-1,1},GenerateConditions->False]/.{s->Q^2}
+	ReplaceAll[(2\[Pi])/(64\[Pi]^2 Q^2) (p3/p1) Integrate[msqrd,{z,-1,1},GenerateConditions->False],{s->Q^2}]
 
 ];
 
@@ -499,13 +501,13 @@ ComputeMandelstamTBound[M_, m1_, m2_, m3_, s_, t_]:=Module[{E1,E2},
 ];
 
 
-Options[HazmaComputeDNDE]={
+Options[ScalarMediatorComputeDNDE]={
 	Adjacencies->{3,4,5},
 	Paint->False,
 	FinalSubstitutions->{Global`M$FACouplings}
 };
 
-HazmaComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates,msqrd,\[Sigma]0,p1,p2,p3,p4,k,m1,m2,m3,m4,s,t,u,E1,E3,tbounds,tintegral,dndE,preFactor},
+ScalarMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates,msqrd,\[Sigma]0,p1,p2,p3,p4,k,m1,m2,m3,m4,s,t,u,E1,E3,tbounds,tintegral,dndE,preFactor},
 	\[Sigma]0=HazmaComputeCrossSection22[inStates,outStates,Q,Adjacencies->OptionValue[Adjacencies]];
 	newOutStates=outStates;
 	AppendTo[newOutStates,state\[Gamma]];
@@ -532,7 +534,8 @@ HazmaComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates
 		OutgoingMomenta->{p3,p4,k},
 		SMP->True,
 		TransversePolarizationVectors->{k},
-		ExcludeParticles->{V[1]}
+		(* ignore diagrams with internal photon. They are higher order in \[Alpha] *)
+		ExcludeParticles->{state\[Gamma]}
 	];
 	(* Set the Mandelstam variables *)
 	(* s = (P - k)^2 = (p3 + p4)^2 = m3^2 + m4^2 + 2p3.p4 *)
@@ -550,12 +553,123 @@ HazmaComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates
 	E1=(Q^2+m1^2-m2^2)/(2Q);
 	tintegral=Integrate[msqrd,t,GenerateConditions->False];
 	dndE=Simplify[((tintegral/.tbounds[[1]])-(tintegral/.tbounds[[2]])),Assumptions->{Q>0,Q>m1+m2,Q>m3+m4}];
-	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^2);
+	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^2) * 1/\[Sigma]0;
 	Simplify[
 		ReplaceAll[
 			preFactor*dndE,
 			{s->Q^2(1 - 2 Global`E\[Gamma] / Q),qe->Sqrt[4\[Pi] Global`\[Alpha]em]}],
 		Assumptions->{Q>0, Q-(m3+m4)^2/Q > 2 * Global`E\[Gamma] > 0,m1>0,m2>0,m3>0,m4>0}]
+];
+
+
+(* ::Text:: *)
+(*Vector Mediator*)
+
+
+Options[VectorMediatorComputeDNDE]={
+	Adjacencies->{3,4,5},
+	Paint->False,
+	FinalSubstitutions->{Global`M$FACouplings}
+};
+
+VectorMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates,msqrd,\[Sigma]0,P,p1,p2,p3,p4,k,m1,m2,m3,m4,s,t,u,E1,E3,tbounds,tintegral,dndE,preFactor,X\[Mu]\[Nu],L\[Mu]\[Nu],ampFS,ampIS,X,L},
+	\[Sigma]0=HazmaComputeCrossSection22[inStates,outStates,Q,Adjacencies->OptionValue[Adjacencies]];
+	newOutStates=outStates;
+	AppendTo[newOutStates,state\[Gamma]];
+	(* Factor the amplitude into L\[Mu]\[Nu]*X\[Mu]\[Nu]/propagator *)
+	(* Initial state M(xx\[Rule]V)^2/4 *)
+	ampIS=FeynCalc`Contract[HazmaCreateAmplitude[
+		inStates, 
+		{statev},
+		Adjacencies->OptionValue[Adjacencies],
+		Paint->OptionValue[Paint],
+		ChangeDimension->4,
+		FinalSubstitutions->Global`M$FACouplings,
+		IncomingMomenta->{p1,p2},
+		List->False,
+		LorentzIndexNames->{},
+		OutgoingMomenta->{P},
+		SMP->True,
+		TransversePolarizationVectors->{},
+		ExcludeParticles->{state\[Gamma]}
+	]];
+	(* Final state piece *)
+	ampFS=FeynCalc`Contract[HazmaCreateAmplitude[
+		{statev}, 
+		newOutStates,
+		Adjacencies->OptionValue[Adjacencies],
+		Paint->OptionValue[Paint],
+		ChangeDimension->4,
+		FinalSubstitutions->Global`M$FACouplings,
+		IncomingMomenta->{P},
+		List->False,
+		LorentzIndexNames->{},
+		OutgoingMomenta->{p3,p4,k},
+		SMP->True,
+		TransversePolarizationVectors->{k},
+		ExcludeParticles->{state\[Gamma]}
+	]];
+	m1=FeynArts`TheMass[inStates[[1]]];
+	m2=FeynArts`TheMass[inStates[[2]]];
+	m3=FeynArts`TheMass[outStates[[1]]];
+	m4=FeynArts`TheMass[outStates[[2]]];
+	(* set masses *)
+	FeynCalc`SP[p1,p1]=m1^2;
+	FeynCalc`SP[p2,p2]=m2^2;
+	FeynCalc`SP[p3,p3]=m3^2;
+	FeynCalc`SP[p4,p4]=m4^2;
+	FeynCalc`SP[k,k]=0;
+	
+	ampIS=ReplaceAll[ampIS,{
+		FeynCalc`DiracGamma[FeynCalc`Momentum[FeynCalc`Polarization[P,-I]]]:>FeynCalc`GA[\[Mu]],
+		FeynCalc`Pair[a__FeynCalc`Momentum,FeynCalc`Momentum[FeynCalc`Polarization[P, I]]]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]],
+		FeynCalc`Pair[FeynCalc`Momentum[FeynCalc`Polarization[P, I]],a__FeynCalc`Momentum]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]]}
+		];
+	L\[Mu]\[Nu]=ampIS*ReplaceAll[FeynCalc`ComplexConjugate[ampIS],\[Mu]->\[Nu]];
+	L\[Mu]\[Nu]=ReplaceAll[FeynCalc`FermionSpinSum[L\[Mu]\[Nu],FeynCalc`ExtraFactor->1/4],FeynCalc`DiracTrace->FeynCalc`TR];
+	L=Simplify[FeynCalc`Contract[L\[Mu]\[Nu]*FeynCalc`MT[\[Mu],\[Nu]]]]/(3Q^2);
+	
+	(* Final state Integrate[M(V\[Rule]finalstate)^2/4,phasespace] *)
+	ampFS=ReplaceAll[ampFS,{
+		FeynCalc`DiracGamma[FeynCalc`Momentum[FeynCalc`Polarization[P,I]]]:>FeynCalc`GA[\[Mu]],
+		FeynCalc`Pair[a__FeynCalc`Momentum,FeynCalc`Momentum[FeynCalc`Polarization[P, I]]]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]],
+		FeynCalc`Pair[FeynCalc`Momentum[FeynCalc`Polarization[P, I]],a__FeynCalc`Momentum]:>FeynCalc`Pair[a,FeynCalc`LorentzIndex[\[Mu]]]}
+		];
+	X\[Mu]\[Nu]=ampFS*ReplaceAll[FeynCalc`ComplexConjugate[ampFS],\[Mu]->\[Nu]];
+	X\[Mu]\[Nu]=ReplaceAll[FeynCalc`FermionSpinSum[X\[Mu]\[Nu]],FeynCalc`DiracTrace->FeynCalc`TR];
+	X\[Mu]\[Nu]=FeynCalc`DoPolarizationSums[X\[Mu]\[Nu],k,0];
+	X=Simplify[FeynCalc`Contract[X\[Mu]\[Nu]*FeynCalc`MT[\[Mu],\[Nu]]]]/(3Q^2);
+	
+	msqrd=X*L (3*Q^4)/ ((Q^2-Global`mv^2)^2+(Global`mv*Global`widthv)^2);
+	
+	(* Set the Mandelstam variables *)
+	FeynCalc`SP[p3,p4]=(s-m3^2-m4^2)/2; (* s = (P - k)^2 *)
+	FeynCalc`SP[k, p4]=(t-m4^2)/2; (* t = (P - p3)^2 *)
+	FeynCalc`SP[k, p3]=(u-m3^2)/2; (* u = (P - p4)^2 *)
+	FeynCalc`SP[p1,p2]=(Q^2-m1^2-m2^2)/2;
+
+	msqrd=ReplaceAll[msqrd,{u->Q^2+m3^2+m4^2-s-t}];
+
+	tbounds=ComputeMandelstamTBound[Q, 0, m3, m4, s, t];
+	E1=(Q^2+m1^2-m2^2)/(2Q);
+	tintegral=Integrate[msqrd,t,GenerateConditions->False];
+	dndE=Simplify[((tintegral/.tbounds[[1]])-(tintegral/.tbounds[[2]])),Assumptions->{Q>0,Q>m1+m2,Q>m3+m4}];
+	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^2)*1/\[Sigma]0;
+	Simplify[
+		ReplaceAll[
+			preFactor*dndE,
+			{s->Q^2(1 - 2 Global`E\[Gamma] / Q),Global`qe->Sqrt[4\[Pi] Global`\[Alpha]em]}],
+		Assumptions->{Q>0, Q-(m3+m4)^2/Q > 2 * Global`E\[Gamma] > 0,m1>0,m2>0,m3>0,m4>0}]
+];
+
+
+HazmaComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates,msqrd,\[Sigma]0,p1,p2,p3,p4,k,m1,m2,m3,m4,s,t,u,E1,E3,tbounds,tintegral,dndE,preFactor},
+	(* TODO: Add options *)
+	If[$HazmaModel==="scalar",Return[ScalarMediatorComputeDNDE[inStates,outStates,Q]],Continue];
+	(* TODO: Add options *)
+	If[$HazmaModel==="vector",Return[VectorMediatorComputeDNDE[inStates,outStates,Q]],Continue];
+	(* TODO: Throw error - can't do axial vector yet. *)
+	Throw["invalid model"]
 ];
 
 
