@@ -556,8 +556,8 @@ ScalarMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{new
 	preFactor=(2*Q)/(4*Q Sqrt[E1^2-m1^2]) 1/(16*Q^2 (2\[Pi])^3) * 1/\[Sigma]0;
 	Simplify[
 		ReplaceAll[
-			preFactor*dndE,
-			{s->Q^2(1 - 2 Global`E\[Gamma] / Q),qe->Sqrt[4\[Pi] Global`\[Alpha]em]}],
+			(-1)preFactor*dndE,
+			{s->Q^2(1 - 2 Global`E\[Gamma] / Q),Global`qe->Sqrt[4\[Pi] Global`\[Alpha]em]}],
 		Assumptions->{Q>0, Q-(m3+m4)^2/Q > 2 * Global`E\[Gamma] > 0,m1>0,m2>0,m3>0,m4>0}]
 ];
 
