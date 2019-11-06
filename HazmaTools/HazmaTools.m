@@ -432,7 +432,7 @@ Options[HazmaComputeCrossSection22]={
 	Truncated->False
 };
 
-HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[{msqrd,inMomenta,outMomenta,m1,m2,m3,m4,s,t,u,E1,E3,z,p1,p3},
+HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[{msqrd,inMomenta,outMomenta,m1,m2,m3,m4,s,t,u,E1,E3,z,p1,p3,preFactor},
 	ClearScalarProducts[];
 	(* Create the amplitude *)
 	msqrd=HazmaCreateAmplitudeSquared[
@@ -484,8 +484,12 @@ HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[
 	p1=Sqrt[E1^2-m1^2];
 	p3=Sqrt[E3^2-m3^2];
 	msqrd=Simplify[ReplaceAll[msqrd,{t->m1^2+m3^2-2(E1*E3-z p1*p3)}]];
+	
+	preFactor=(2\[Pi])/(64\[Pi]^2 Q^2) (p3/p1);
+	(* If final state particles are identical, divide by 2 *)
+	If[outStates[[1]]===outStates[[2]],preFactor=preFactor/2,Continue];
 
-	ReplaceAll[(2\[Pi])/(64\[Pi]^2 Q^2) (p3/p1) Integrate[msqrd,{z,-1,1},GenerateConditions->False],{s->Q^2}]
+	ReplaceAll[preFactor*Integrate[msqrd,{z,-1,1},GenerateConditions->False],{s->Q^2}]
 
 ];
 
