@@ -50,6 +50,23 @@ statep::usage="FeynArts state for psuedo-scalar mediator";
 statev::usage="FeynArts state for vector mediator";
 
 
+NeutralPion::usage="FeynArts state for neutral pion";
+ChargedPionM::usage="FeynArts state for negatively charged pion";
+ChargedPionP::usage="FeynArts state for positively charged pion";
+NeutralKaon::usage="FeynArts state for neutral kaon";
+AntiNeutralKaon::usage="FeynArts state for anti neutral kaon";
+ChargedKaonM::usage="FeynArts state for negatively charged kaon";
+ChargedKaonP::usage="FeynArts state for positively charged kaon";
+Eta::usage="FeynArts state for eta";
+Rho::usage="FeynArts state for rho";
+Omega::usage="FeynArts state for omega";
+DarkMatter::usage="FeynArts state for dark matter";
+AntiDarkMatter::usage="FeynArts state for anti dark matter";
+ScalarMediator::usage="FeynArts state for scalar-mediator";
+PseudoScalarMediator::usage="FeynArts state for pseudo-scalar-mediator";
+VectorMediator::usage="FeynArts state for vector-mediator";
+
+
 Lepton::usage="FeynArts state for generic down-type lepton";
 AntiLepton::usage="FeynArts state for generic anti-down-type lepton";
 Electron::usage="FeynArts state for electron";
@@ -84,20 +101,20 @@ BottomQuark::usage="FeynArts state for bottom-quark";
 AntiBottomQuark::usage="FeynArts state for anti botoom-quark";
 Photon::usage="FeynArts state for photon";
 ZBoson::usage="FeynArts state for Z";
-WBosonMinus::usage="FeynArts state for W-";
-WBosonPlus::usage="FeynArts state for W+";
+WBosonM::usage="FeynArts state for W-";
+WBosonP::usage="FeynArts state for W+";
 Higgs::usage="FeynArts state for Higgs";
-ZGoldstone::usage="FeynArts state for Golstone associated with Z";
-WMinusGoldstone::usage="FeynArts state for Golstone associated with W-";
-WPlusGoldstone::usage="FeynArts state for Golstone associated with W+";
-PhotonGhost::usage="FeynArts state for ghost associated with photon";
-AntiPhotonGhost::usage="FeynArts state for anti-ghost associated with photon";
-ZGhost::usage="FeynArts state for ghost associated with Z";
-AntiZGhost::usage="FeynArts state for anti-ghost associated with Z";
-WMinusGhost::usage="FeynArts state for ghost associated with W-";
-AntiWMinusGhost::usage="FeynArts state for anti-ghost associated with W-";
-WPlusGhost::usage="FeynArts state for ghost associated with W+";
-AntiWPlusGhost::usage="FeynArts state for anti-ghost associated with W+";
+GoldstoneZBoson::usage="FeynArts state for Golstone associated with Z";
+GoldstoneWBosonM::usage="FeynArts state for Golstone associated with W-";
+GoldstoneWBosonP::usage="FeynArts state for Golstone associated with W+";
+GhostPhoton::usage="FeynArts state for ghost associated with photon";
+AntiGhostPhoton::usage="FeynArts state for anti-ghost associated with photon";
+GhostZBoson::usage="FeynArts state for ghost associated with Z";
+AntiGhostZBoson::usage="FeynArts state for anti-ghost associated with Z";
+GhostWBosonM::usage="FeynArts state for ghost associated with W-";
+AntiGhostWBosonM::usage="FeynArts state for anti-ghost associated with W-";
+GhostWBosonP::usage="FeynArts state for ghost associated with W+";
+AntiGhostWBosonP::usage="FeynArts state for anti-ghost associated with W+";
 
 
 HazmaGenerateDiagrams::usage="HazmaGenerateDiagrams[inStates,outStates] Generate `FeynArts` Feynmann diagrams for the process `inStates`->`outStates`.";
@@ -149,7 +166,7 @@ ComputeMandelstamTBound[M_, m1_, m2_, m3_, s_, t_]:=Module[{E1,E2},
 ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*States*)
 
 
@@ -179,63 +196,94 @@ statep=FeynArts`S[7];
 statev=FeynArts`V[4];
 
 
-(* SM States from "SM" model for testing *)
+(* SM Mesons *)
+NeutralPion:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`S[1], Throw[$Failed,NeutralPion::NotInModel]];
+ChargedPionM:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`S[2], Throw[$Failed,ChargedPionM::NotInModel]];
+ChargedPionP:=If[MemberQ[{"scalar","vector"},$HazmaModel], -FeynArts`S[2], Throw[$Failed,ChargedPionP::NotInModel]];
+NeutralKaon:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`S[3], Throw[$Failed,NeutralKaon::NotInModel]];
+AntiNeutralKaon:=If[MemberQ[{"scalar","vector"},$HazmaModel], -FeynArts`S[3], Throw[$Failed,AntiNeutralKaon::NotInModel]];
+ChargedKaonM:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`S[4], Throw[$Failed,ChargedKaonM::NotInModel]];
+ChargedKaonP:=If[MemberQ[{"scalar","vector"},$HazmaModel], -FeynArts`S[4], Throw[$Failed,ChargedKaonP::NotInModel]];
+Eta:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`S[5], Throw[$Failed,Eta::NotInModel]];
+
+(* SM vectors *)
+Photon:=If[MemberQ[{"scalar","vector","SM","SMQCD"},$HazmaModel], FeynArts`V[1], Throw[$Failed,Photon::NotInModel]];
+Rho:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`V[2], Throw[$Failed,Rho::NotInModel]];
+Omega:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`V[1], Throw[$Failed,Omega::NotInModel]];
+
+(* Leptons *)
+Neutrino:=If[MemberQ[{"scalar","vector","SM","SMQCD"},$HazmaModel], FeynArts`F[1], Throw[$Failed,Neutrino::NotInModel]];
+AntiNeutrino:=If[MemberQ[{"scalar","vector","SM","SMQCD"},$HazmaModel], -FeynArts`V[1], Throw[$Failed,AntiNeutrino::NotInModel]];
+Lepton:=If[MemberQ[{"scalar","vector","SM","SMQCD"},$HazmaModel], FeynArts`F[2], Throw[$Failed,Lepton::NotInModel]];
+AntiLepton:=If[MemberQ[{"scalar","vector","SM","SMQCD"},$HazmaModel], -FeynArts`F[2], Throw[$Failed,AntiLepton::NotInModel]];
+
+(* DM *)
+DarkMatter:=If[MemberQ[{"scalar","vector"},$HazmaModel], FeynArts`F[3], Throw[$Failed,DarkMatter::NotInModel]];
+AntiDarkMatter:=If[MemberQ[{"scalar","vector"},$HazmaModel], -FeynArts`F[3], Throw[$Failed,AntiDarkMatter::NotInModel]];
+
+(* mediators *)
+ScalarMediator:=If[MemberQ[{"scalar"},$HazmaModel], FeynArts`S[7], Throw[$Failed,ScalarMediator::NotInModel]];
+PseudoScalarMediator:=If[MemberQ[{"pseudo-scalar"},$HazmaModel], FeynArts`S[7], Throw[$Failed,PseudoScalarMediator::NotInModel]];
+VectorMediator:=If[MemberQ[{"vector"},$HazmaModel], FeynArts`V[4], Throw[$Failed,VectorMediator::NotInModel]];
+
+(* SM/SMQCD only states *)
+
 (* down-type leptons *)
-Lepton=FeynArts`F[2];
-AntiLepton=FeynArts`F[2];
-Electron=FeynArts`F[2,{1}];
-AntiElectron=-FeynArts`F[2,{1}];
-Muon=FeynArts`F[2,{2}];
-AntiMuon=-FeynArts`F[2,{2}];
-Tau=FeynArts`F[2,{3}];
-AntiTau=-FeynArts`F[2,{3}];
+Electron:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[2,{1}], Throw[$Failed,Electron::NotInModel]];
+AntiElectron:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[2,{1}], Throw[$Failed,AntiElectron::NotInModel]];
+Muon:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[2,{2}], Throw[$Failed,Muon::NotInModel]];
+AntiMuon:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[2,{2}], Throw[$Failed,AntiMuon::NotInModel]];
+Tau:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[2,{3}], Throw[$Failed,Tau::NotInModel]];
+AntiTau:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[2,{3}], Throw[$Failed,AntiTau::NotInModel]];
+
 (* neutinos *)
-Neutrino=FeynArts`F[1];
-AntiNeutrino=FeynArts`F[1];
-ElectronNeutrino=FeynArts`F[1,{1}];
-AntiElectronNeutrino=-FeynArts`F[1,{1}];
-MuonNeutrino=FeynArts`F[1,{2}];
-AntiMuonNeutrino=-FeynArts`F[1,{2}];
-TauNeutrino=FeynArts`F[1,{3}];
-AntiTauNeutrino=-FeynArts`F[1,{3}];
+ElectronNeutrino:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[1,{1}], Throw[$Failed,ElectronNeutrino::NotInModel]];
+AntiElectronNeutrino:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[1,{1}], Throw[$Failed,AntiElectronNeutrino::NotInModel]];
+MuonNeutrino:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[1,{2}], Throw[$Failed,MuonNeutrino::NotInModel]];
+AntiMuonNeutrino:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[1,{2}], Throw[$Failed,AntiMuonNeutrino::NotInModel]];
+TauNeutrino:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[1,{3}], Throw[$Failed,TauNeutrino::NotInModel]];
+AntiTauNeutrino:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[1,{3}], Throw[$Failed,AntiTauNeutrino::NotInModel]];
+
 (* up-type quarks *)
-UpTypeQuark=FeynArts`F[3];
-AntiUpTypeQuark=FeynArts`F[3];
-UpQuark=FeynArts`F[3,{1}];
-AntiUpQuark=-FeynArts`F[3,{1}];
-CharmQuark=FeynArts`F[3,{2}];
-AntiCharmQuark=-FeynArts`F[3,{2}];
-TopQuark=FeynArts`F[3,{3}];
-AntiTopQuark=-FeynArts`F[3,{3}];
+UpTypeQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[3], Throw[$Failed,UpTypeQuark::NotInModel]];
+AntiUpTypeQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[3], Throw[$Failed,AntiUpTypeQuark::NotInModel]];
+UpQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[3,{1}], Throw[$Failed,UpQuark::NotInModel]];
+AntiUpQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[3,{1}], Throw[$Failed,AntiUpQuark::NotInModel]];
+CharmQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[3,{2}], Throw[$Failed,CharmQuark::NotInModel]];
+AntiCharmQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[3,{2}], Throw[$Failed,AntiCharmQuark::NotInModel]];
+TopQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[3,{3}], Throw[$Failed,TopQuark::NotInModel]];
+AntiTopQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[3,{3}], Throw[$Failed,AntiTopQuark::NotInModel]];
+
 (* down-type quarks *)
-DownTypeQuark=FeynArts`F[4];
-AntiDownTypeQuark=FeynArts`F[4];
-DownQuark=FeynArts`F[4,{1}];
-AntiDownQuark=-FeynArts`F[4,{1}];
-StrangeQuark=FeynArts`F[4,{2}];
-AntiStrangeQuark=-FeynArts`F[4,{2}];
-BottomQuark=FeynArts`F[4,{3}];
-AntiBottomQuark=-FeynArts`F[4,{3}];
+DownTypeQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[4], Throw[$Failed,DownTypeQuark::NotInModel]];
+AntiDownTypeQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[4], Throw[$Failed,AntiDownTypeQuark::NotInModel]];
+DownQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[4,{1}], Throw[$Failed,DownQuark::NotInModel]];
+AntiDownQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[4,{1}], Throw[$Failed,AntiDownQuark::NotInModel]];
+StrangeQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[4,{2}], Throw[$Failed,StrangeQuark::NotInModel]];
+AntiStrangeQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[4,{2}], Throw[$Failed,AntiStrangeQuark::NotInModel]];
+BottomQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`F[4,{3}], Throw[$Failed,BottomQuark::NotInModel]];
+AntiBottomQuark:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`F[4,{3}], Throw[$Failed,AntiBottomQuark::NotInModel]];
+
 (* vector bosons *)
-Photon=FeynArts`V[1];
-ZBoson=FeynArts`V[2];
-WBosonMinus=FeynArts`V[3];
-WBosonPlus=-FeynArts`V[3];
-(* Higgs *)
-Higgs=FeynArts`S[1];
-(* Golstones *)
-ZGoldstone=FeynArts`S[2];
-WMinusGoldstone=FeynArts`S[3];
-WPlusGoldstone=-FeynArts`S[3];
+ZBoson:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`V[2], Throw[$Failed,ZBoson::NotInModel]];
+WBosonM:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`V[3], Throw[$Failed,WBosonM::NotInModel]];
+WBosonP:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`V[3], Throw[$Failed,WBosonP::NotInModel]];
+
+(* Higgs and Goldstones *)
+Higgs:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`S[1], Throw[$Failed,Higgs::NotInModel]];
+GoldstoneZBoson:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`S[2], Throw[$Failed,GoldstoneZBoson::NotInModel]];
+GoldstoneWBosonM:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`S[3], Throw[$Failed,GoldstoneWBosonM::NotInModel]];
+GoldstoneWBosonP:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`S[3], Throw[$Failed,GoldstoneWBosonP::NotInModel]];
+
 (* ghosts *)
-PhotonGhost=FeynArts`U[1];
-AntiPhotonGhost=FeynArts`U[1];
-ZGhost=FeynArts`U[2];
-AntiZGhost=-FeynArts`U[2];
-WMinusGhost=FeynArts`U[3];
-AntiWMinusGhost=-FeynArts`U[3];
-WPlusGhost=FeynArts`U[4];
-AntiWPlusGhost=-FeynArts`U[4];
+GhostPhoton:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`U[1], Throw[$Failed,GhostPhoton::NotInModel]];
+AntiGhostPhoton:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`U[1], Throw[$Failed,AntiGhostPhoton::NotInModel]];
+GhostZBoson:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`U[2], Throw[$Failed,GhostZBoson::NotInModel]];
+AntiGhostZBoson:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`U[2], Throw[$Failed,AntiGhostZBoson::NotInModel]];
+GhostWBosonM:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`U[3], Throw[$Failed,GhostWBosonM::NotInModel]];
+AntiGhostWBosonM:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`U[3], Throw[$Failed,AntiGhostWBosonM::NotInModel]];
+GhostWBosonP:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], FeynArts`U[4], Throw[$Failed,GhostWBosonP::NotInModel]];
+AntiGhostWBosonP:=If[MemberQ[{"SM","SMQCD"},$HazmaModel], -FeynArts`U[5], Throw[$Failed,AntiGhostWBosonP::NotInModel]];
 
 
 (* determine if state is a fermion *)
@@ -303,7 +351,7 @@ HazmaGenerateDiagrams[inStates_, outStates_,OptionsPattern[]]:=Block[{tops,diags
 ]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Amplitude Creation*)
 
 
@@ -332,7 +380,7 @@ HazmaSubstitutionUnstableMediatorPropagator[exp_]:=Module[{},
 
 Clear[HazmaCreateAmplitude];
 
-Options[HazmaCreateAmplitude]={
+Options[HazmaCreateAmplitude]:={
 	FeynArts`LoopNumber->0,
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`ExcludeParticles->{},
@@ -340,7 +388,7 @@ Options[HazmaCreateAmplitude]={
 	FeynArts`InsertionLevel->{FeynArts`Particles},
 	FeynArts`Paint->False,
 	FeynCalc`ChangeDimension->4,
-	FeynCalc`FinalSubstitutions->{Global`M$FACouplings},
+	FeynCalc`FinalSubstitutions->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}],
 	FeynCalc`IncomingMomenta->{},
 	List->False,
 	FeynCalc`LoopMomenta->{},
@@ -400,11 +448,11 @@ Map[Simplify,ampFC]
 ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Computing Squared Amplitudes*)
 
 
-Options[HazmaCreateAmplitudeSquared]={
+Options[HazmaCreateAmplitudeSquared]:={
 	FeynArts`LoopNumber->0,
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`ExcludeParticles->{},
@@ -415,7 +463,7 @@ Options[HazmaCreateAmplitudeSquared]={
 	FeynArts`PreFactor->-I (2 \[Pi])^(-4 FeynArts`LoopNumber),
 	FeynArts`Truncated->False,
 	FeynCalc`ChangeDimension->4,
-	FeynCalc`FinalSubstitutions->{Global`M$FACouplings},
+	FeynCalc`FinalSubstitutions->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}],
 	FeynCalc`IncomingMomenta->{},
 	List->False,
 	FeynCalc`LoopMomenta->{},
@@ -525,15 +573,15 @@ msqrd
 ];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Cross Sections*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Compute 2->2 Cross Sections*)
 
 
-Options[HazmaComputeCrossSection22]={
+Options[HazmaComputeCrossSection22]:={
 	FeynArts`LoopNumber->0,
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`ExcludeParticles->{},
@@ -542,7 +590,7 @@ Options[HazmaComputeCrossSection22]={
 	FeynArts`GaugeRules->_FeynArts`FAGaugeXi->1,
 	FeynArts`Paint->False,
 	FeynCalc`ChangeDimension->4,
-	FeynCalc`FinalSubstitutions->{Global`M$FACouplings},
+	FeynCalc`FinalSubstitutions->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}],
 	FeynCalc`LoopMomenta->{},
 	FeynCalc`SMP->True
 };
@@ -595,11 +643,11 @@ HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[
 ];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Widths*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Compute Width 1->2*)
 
 
@@ -608,7 +656,7 @@ Options[HazmaComputeWidth12]={
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`ExcludeParticles->{},
 	FeynArts`ExcludeTopologies->{FeynArts`Tadpoles, FeynArts`SelfEnergies, FeynArts`WFCorrections},
-	FeynArts`InsertionLevel->{FeynArts`Particles},
+	FeynArts`InsertionLevel->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}],
 	FeynArts`Paint->False,
 	FeynArts`GaugeRules->_FeynArts`FAGaugeXi->1,
 	FeynCalc`ChangeDimension->4,
@@ -666,11 +714,11 @@ HazmaComputeWidth12[inState_, outStates_,OptionsPattern[]] := Module[{msqrd,P,p1
 ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Compute Width 1->3*)
 
 
-Options[HazmaComputeWidth13]={
+Options[HazmaComputeWidth13]:={
 	FeynArts`LoopNumber->0,
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`ExcludeParticles->{},
@@ -679,7 +727,7 @@ Options[HazmaComputeWidth13]={
 	FeynArts`Paint->False,
 	FeynArts`GaugeRules->_FeynArts`FAGaugeXi->1,
 	FeynCalc`ChangeDimension->4,
-	FeynCalc`FinalSubstitutions->{Global`M$FACouplings},
+	FeynCalc`FinalSubstitutions->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}],
 	FeynCalc`LoopMomenta->{},
 	FeynCalc`SMP->True
 };
@@ -741,10 +789,10 @@ HazmaComputeWidth13[inState_, outStates_,OptionsPattern[]] := Module[{msqrd,P,p1
 (*Computing dNdE*)
 
 
-Options[ScalarMediatorComputeDNDE]={
+Options[ScalarMediatorComputeDNDE]:={
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`Paint->False,
-	FeynCalc`FinalSubstitutions->{Global`M$FACouplings}
+	FeynCalc`FinalSubstitutions->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}]
 };
 
 ScalarMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates,msqrd,\[Sigma]0,p1,p2,p3,p4,k,m1,m2,m3,m4,s,t,u,E1,E3,tbounds,tintegral,dndE,preFactor},
@@ -806,10 +854,10 @@ ScalarMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{new
 (*Vector Mediator*)
 
 
-Options[VectorMediatorComputeDNDE]={
+Options[VectorMediatorComputeDNDE]:={
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`Paint->False,
-	FeynCalc`FinalSubstitutions->{Global`M$FACouplings}
+	FeynCalc`FinalSubstitutions->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}]
 };
 
 VectorMediatorComputeDNDE[inStates_,outStates_,Q_,OptionsPattern[]]:=Module[{newOutStates,msqrd,\[Sigma]0,P,p1,p2,p3,p4,k,m1,m2,m3,m4,s,t,u,E1,E3,tbounds,tintegral,dndE,preFactor,X\[Mu]\[Nu],L\[Mu]\[Nu],ampFS,ampIS,X,L},
