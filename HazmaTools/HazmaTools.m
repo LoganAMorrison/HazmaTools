@@ -351,7 +351,7 @@ HazmaGenerateDiagrams[inStates_, outStates_,OptionsPattern[]]:=Block[{tops,diags
 ]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Amplitude Creation*)
 
 
@@ -573,7 +573,7 @@ msqrd
 ];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Cross Sections*)
 
 
@@ -647,7 +647,7 @@ HazmaComputeCrossSection22[inStates_, outStates_,Q_,OptionsPattern[]] := Module[
 (*Widths*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Compute Width 1->2*)
 
 
@@ -656,11 +656,11 @@ Options[HazmaComputeWidth12]={
 	FeynArts`Adjacencies->{3,4,5},
 	FeynArts`ExcludeParticles->{},
 	FeynArts`ExcludeTopologies->{FeynArts`Tadpoles, FeynArts`SelfEnergies, FeynArts`WFCorrections},
-	FeynArts`InsertionLevel->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}],
+	FeynArts`InsertionLevel->{FeynArts`Particles},
 	FeynArts`Paint->False,
 	FeynArts`GaugeRules->_FeynArts`FAGaugeXi->1,
 	FeynCalc`ChangeDimension->4,
-	FeynCalc`FinalSubstitutions->{Global`M$FACouplings},
+	FeynCalc`FinalSubstitutions->If[MemberQ[{"scalar","vector"},$HazmaModel],{Global`M$FACouplings},{}],
 	FeynCalc`LoopMomenta->{},
 	FeynCalc`SMP->True
 };
