@@ -20,7 +20,19 @@ $HazmaTools = "SM"
 $HazmaTools = "SMQCD"
 ```
 
-Note that switching the model in the middle of a session should work. You may have to run the function twice to get things to work properly. Alternatively, restart the session using `Quit[]` and reload `HazmaTools`. To compute an amplitude (or squared amplitude), run:
+Note that switching the model in the middle of a session should work. You may have to run the function twice to get things to work properly. Alternatively, restart the session using `Quit[]` and reload `HazmaTools`. The availible particles for the scalar and vector models are: 
+
+```mathematica
+DarkMatter/AntiDarkMatter
+NeutralPion
+ChargedPionM/ChargedPionP
+Lepton/AntiLepton
+Photon
+ScalarMediator (* scalar model only *)
+VectorMediator (* vector model only *)
+```
+
+To compute an amplitude (or squared amplitude), run:
 
 ```mathematica
 HazmaComputeAmplitude[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton}, IncomingMomenta -> {px, pxbar}, OutgoingMomenta -> {pl, plbar}]
