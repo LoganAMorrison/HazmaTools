@@ -1,2 +1,6 @@
 dev
 .idea
+.DS_Store
+.project
+docbuild.xml
+HazmaTools.iml
