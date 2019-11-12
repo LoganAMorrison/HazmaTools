@@ -1,13 +1,7 @@
 # HazmaTools
 Mathematica tools for Hazma
 
-To install, clone this repo and navigate to the directory. Then, create a symlink/alias for `HazmaTools.m` to the Mathematica applications directory using:
-
-```code
-ln  path/to/HazmaTools.m path/to/Mathematica/Applications
-```
-
-Then, to load `HazmaTools` into a Mathematica session, run:
+To install, clone this repo into your Mathematica `Applications` directory. Then, to load `HazmaTools` into a Mathematica session, run:
 
 ```Mathematica
 <<HazmaTools`
@@ -16,23 +10,37 @@ Then, to load `HazmaTools` into a Mathematica session, run:
 To set the model, run:
 
 ```mathematica
+(* set model to scalar mediator model: *)
 $HazmaTools = "scalar"
+(* set model to vector mediator model: *)
+$HazmaTools = "vector"
+(* set model to standard model (for testing): *)
+$HazmaTools = "SM"
+(* set model to standard model QCD (for testing): *)
+$HazmaTools = "SMQCD"
 ```
 
-This will set the model to the scalar-mediator model. Use `"vector"` for the vector mediator model. To squared amplitudes, run:
+Note that switching the model in the middle of a session should work. You may have to run the function twice to get things to work properly. Alternatively, restart the session using `Quit[]` and reload `HazmaTools`. To compute an amplitude (or squared amplitude), run:
 
 ```mathematica
-HazmaCreateAmplitudeSquared[{statex, statexbar}, {statel, statelbar}, IncomingMomenta -> {p1, p2}, OutgoingMomenta -> {p3, p4}]
+HazmaComputeAmplitude[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton}, IncomingMomenta -> {px, pxbar}, OutgoingMomenta -> {pl, plbar}]
+HazmaComputeAmplitudeSquared[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton}, IncomingMomenta -> {px, pxbar}, OutgoingMomenta -> {pl, plbar}]
 ```
 
 To compute a 2->2 cross section, use:
 
 ```mathematica
-HazmaComputeCrossSection22[{statex, statexbar}, {statel, statelbar},Q]
+HazmaComputeCrossSection22[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton}, Q]
+```
+
+To compute a 1->2 width, use:
+
+```mathematica
+HazmaComputeWidth[ScalarMediator, {Lepton, AntiLepton}]
 ```
 
 To compute dNdE, use:
 
 ```mathematica
-HazmaComputeDNDE[{statex, statexbar}, {statel, statelbar}, Q]
+HazmaComputeDNDE[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton},Q]
 ```
