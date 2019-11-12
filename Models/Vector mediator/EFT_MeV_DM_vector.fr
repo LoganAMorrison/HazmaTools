@@ -1,0 +1,626 @@
+(* ::Package:: *)
+
+(**********************************************************)
+(*                                                        *)
+(*  Model for Chiral perturbation Theory at lowest order  *)
+(*  Follows Scherer's conventions                         *)
+(*                                                        *)
+(**********************************************************)
+
+(*
+TODO:
+-NOTE: earlier versions of FeynRules have a bug where del[..., m] will not work correctly unless Expand is called on its argument or the argument's head is Plus or Minus.
+-NOTE: vertices with more than two mesons will be dropped below to speed up model file generation.
+-Put in widths!
+*)
+
+M$ModelName = "EFT_MeV_DM_vector";
+
+M$Information = {
+    Authors -> {"Adam Coogan", "Logan Morrison"},
+    Date->"4/27/2018",
+    Institutions -> {"UC Santa Cruz"},
+    Emails -> {"acoogan@ucsc.edu", "loanmorr@ucsc.edu"},
+    Version -> 1
+};
+
+(***** Gauge group information *****)
+M$GaugeGroups = {
+    U1EM == {
+        Abelian -> True,
+        CouplingConstant -> qe,
+        GaugeBoson -> A,
+        Charge -> Q
+    }
+};
+
+(***** Parameter list. ALL UNITS ARE IN GeV! *****)
+M$Parameters = {
+    fpi == {
+        ParameterType -> External,
+        Value -> 0.093,
+        TeX -> ComposedChar["f", "\\pi"],
+        Description->"pion decay constant"
+    },
+
+    b0 == {
+        ParameterType -> External,
+        Description -> "mass term coefficient",
+        TeX -> ComposedChar["B", "0"],
+        Value -> 2.617 (* ((mpi0 + mpi)/2)^2 / (mu + md) *)
+    },
+
+    fv == {
+        ParameterType -> External,
+        Description -> "vector coupling F_V",
+        TeX -> ComposedChar["F", "V"],
+        Value -> 0.165 (* MeV *)
+    },
+
+    gv == {
+        ParameterType -> External,
+        Description -> "vector coupling G_V",
+        TeX -> ComposedChar["G", "V"],
+        Value -> 0.055 (* MeV *)
+    },
+
+    muq == {
+        ParameterType -> External,
+        Value -> 0.0024,
+        TeX -> ComposedChar["m", "u"],
+        Description->"mass of the up quark"
+    },
+
+    mdq == {
+        ParameterType -> External,
+        Value -> 0.0048,
+        TeX -> ComposedChar["m", "d"],
+        Description->"mass of the down quark"
+    },
+
+    msq == {
+        ParameterType -> External,
+        Value -> 0.095,
+        TeX -> ComposedChar["m", "s"],
+        Description->"mass of the strange quark"
+    },
+
+    (* Teta == {
+        ParameterType -> External,
+        Value -> -0.2007, (* -11.5 degrees *)
+        TeX -> ComposedChar["\\theta", "\\eta"],
+        Description -> "eta-eta prime mixing angle"
+    }, *)
+
+    alphaEM == {
+        ParameterType -> External,
+        Value -> 1/137.0,
+        TeX -> ComposedChar["\\alpha", "EM"],
+        Description -> "fine structure constant for EM"
+    },
+
+    me == {
+        ParameterType -> External,
+        Value -> 0.000511,
+        TeX -> ComposedChar["m", "e"],
+        Description -> "electron mass"
+    },
+
+    mmu == {
+        ParameterType -> External,
+        Value -> 0.10566,
+        TeX -> ComposedChar["m", "\\mu"],
+        Description -> "muon mass"
+    },
+
+    gvll == {
+        ParameterType -> External,
+        TeX -> ComposedChar["g", "Vll"],
+        Description -> "Sll coupling"
+    },
+
+    gvuu == {
+        ParameterType -> External,
+        TeX -> ComposedChar["g", "Vuu"],
+        Description -> "Suu coupling"
+    },
+
+    gvdd == {
+        ParameterType -> External,
+        TeX -> ComposedChar["g", "Vdd"],
+        Description -> "Sdd coupling"
+    },
+
+    gvss == {
+        ParameterType -> External,
+        TeX -> ComposedChar["g", "Vss"],
+        Description -> "Sss coupling"
+    },
+
+    vh == {
+        ParameterType -> External,
+        TeX -> ComposedChar["v", "H"],
+        Description -> "Higgs vev",
+        Value -> 246.0
+    },
+
+    mv == {
+        ParameterType -> External,
+        TeX -> ComposedChar["m", "V"],
+        Description->"mass of V"
+    },
+
+    vwidth == {
+        ParameterType -> External,
+        TeX -> ComposedChar["\\Gamma", "V"],
+        Description->"width of V"
+    },
+
+    gvxx == {
+        ParameterType -> External,
+        TeX -> ComposedChar["g", "V\\chi\\chi"],
+        Description -> "V\[Chi]\[Chi]C coupling"
+    },
+
+    mx == {
+        ParameterType -> External,
+        TeX -> ComposedChar["m", "\\chi"],
+        Description->"dark matter mass"
+    },
+
+    mVectorRes == {
+        ParameterType -> External,
+        TeX -> ComposedChar["m", "R"],
+        Description->"vector resonance octet mass parameter"
+    },
+
+    mrho == {
+        ParameterType -> External,
+        TeX -> ComposedChar["m", "\\rho"],
+        Description->"rho0 mass"
+    },
+
+    rhowidth == {
+        ParameterType -> External,
+        TeX -> ComposedChar["\\Gamma", "\\rho"],
+        Description->"rho0 width"
+    },
+
+    momega == {
+        ParameterType -> External,
+        TeX -> ComposedChar["m", "\\omega"],
+        Description->"omega mass"
+    },
+
+    omegawidth == {
+        ParameterType -> External,
+        TeX -> ComposedChar["\\Gamma", "\\omega"],
+        Description->"omega width"
+    },
+
+    ml == {
+        ParameterType -> External,
+        TeX -> ComposedChar["m", "l"],
+        Description->"SM fermion mass"
+    },
+
+    Vud == {
+        ParameterType -> External,
+        Value -> 0.974267,
+        TeX -> ComposedChar["V", "ud"],
+        Description -> "ud element of CKM matrix"
+    },
+
+    Vus == {
+        ParameterType -> External,
+        Value -> 0.225369,
+        TeX -> ComposedChar["V", "us"],
+        Description -> "us element of CKM matrix"
+    },
+
+    GF == {
+        ParameterType -> External,
+        Value -> 1.166 * 10^(-5), (* GeV^-2 *)
+        TeX -> ComposedChar["G", "F"],
+        Description -> "Fermi constant"
+    },
+
+    qe == {
+        ParameterType -> Internal,
+        Value -> Sqrt[4 Pi alphaEM],
+        TeX -> "e",
+        Description -> "electric coupling constant"
+    }
+};
+
+(***** Particle classes list ******)
+M$ClassesDescription = {
+    (* Goldstones *)
+    S[1] == {
+        ClassName -> pi0,
+        SelfConjugate -> True,
+        Mass -> {mpi0, 0.13498},
+        Width -> 0,
+        ParticleName -> "pi0",
+        TeXParticleName -> ComposedChar["\\pi", Null, "0"],
+        PropagatorLabel -> ComposedChar["\\pi", Null, "0"]
+    },
+
+    S[2] == {
+        ClassName -> pim,
+        SelfConjugate -> False,
+        Mass -> {mpi, 0.13957},
+        QuantumNumbers -> {Q -> -1},
+        Width -> 0,
+        ParticleName -> "pim",
+        AntiParticleName -> "pip",
+        TeXParticleName -> ComposedChar["\\pi", Null, "-"],
+        TeXAntiParticleName -> ComposedChar["\\pi", Null, "+"],
+        PropagatorLabel -> ComposedChar["\\pi", Null, "-"],
+        PropagatorArrow -> Forward
+    },
+
+    S[3] == {
+        ClassName -> k0,
+        SelfConjugate -> False,
+        Mass -> {mk0, 0.49765},
+        Width -> 0,
+        ParticleName -> "k0",
+        AntiParticleName -> "k0~",
+        TeXParticleName -> ComposedChar["K", Null, "0"],
+        TeXAntiParticleName -> ComposedChar["K", Null, "0", "\\bar"],
+        PropagatorLabel -> ComposedChar["K", Null, "0"],
+        PropagatorArrow -> Forward
+    },
+
+    S[4] == {
+        ClassName -> km,
+        SelfConjugate -> False,
+        Mass -> {mk, 0.49367},
+        QuantumNumbers -> {Q -> -1},
+        Width -> 0,
+        ParticleName -> "km",
+        AntiParticleName -> "kp",
+        TeXParticleName -> ComposedChar["K", Null, "-"],
+        TeXAntiParticleName -> ComposedChar["K", Null, "+"],
+        PropagatorLabel -> ComposedChar["K", Null, "-"],
+        PropagatorArrow -> Forward
+    },
+
+    S[5] == {
+        ClassName -> eta,
+        SelfConjugate -> True,
+        Mass -> {meta, 0.547862},
+        Width -> 0,
+        ParticleName -> "eta",
+        TeXParticleName -> "\\eta",
+        PropagatorLabel -> "\\eta"
+    },
+
+    (* Photon *)
+    V[1] == {
+        ClassName -> A,
+        SelfConjugate -> True,
+        Mass -> 0,
+        Width -> 0,
+        ParticleName -> "A",
+        PropagatorLabel -> "\\gamma"
+    },
+
+    V[2] == {
+        ClassName -> rho,
+        SelfConjugate -> True,
+        Mass -> mrho,
+        Width -> rhowidth,
+        ParticleName -> "rho",
+        PropagatorLabel -> "\\rho"
+    },
+
+    V[3] == {
+        ClassName -> omega,
+        SelfConjugate -> True,
+        Mass -> momega,
+        Width -> omegawidth,
+        ParticleName -> "omega",
+        PropagatorLabel -> "\\omega"
+    },
+
+    V[4] == {
+        ClassName -> Vec,
+        SelfConjugate -> True,
+        Mass -> mv,
+        Width -> vwidth,
+        ParticleName -> "V",
+        PropagatorLabel -> "V"
+    },
+
+    (* SM leptons *)
+    F[1] == {
+        ClassName        -> vl,
+        SelfConjugate    -> False,
+        Mass             -> 0,
+        Width            -> 0,
+        QuantumNumbers   -> {LeptonNumber -> 1},
+        PropagatorLabel  -> {"v"},
+        PropagatorType   -> S,
+        PropagatorArrow  -> Forward
+    },
+
+    F[2] == {
+        ClassName        -> l,
+        SelfConjugate    -> False,
+        Mass             -> ml,
+        QuantumNumbers   -> {Q -> -1, LeptonNumber -> 1},
+        PropagatorLabel  -> {"l"},
+        PropagatorType   -> Straight,
+        PropagatorArrow  -> Forward
+    },
+
+    (* Dark matter *)
+    F[3] == {
+        ClassName -> x,
+        SelfConjugate -> False,
+        Mass -> mx,
+        Width -> 0,
+        ParticleName -> "x",
+        AntiParticleName -> "x~",
+        TeXParticleName -> "\\chi",
+        TeXAntiParticleName -> ComposedChar["\\chi", Null, Null, "\\bar"],
+        PropagatorLabel -> "\\chi",
+        PropagatorArrow -> Forward
+    }
+}
+
+(***** Gauge parameters for FeynArts *****)
+GaugeXi[V[1]] = GaugeXi[A];
+GaugeXi[V[2]] = GaugeXi[rho];
+GaugeXi[V[3]] = GaugeXi[omega];
+GaugeXi[V[4]] = GaugeXi[Vec];
+GaugeXi[S[1]] = 1;
+GaugeXi[S[2]] = 1;
+GaugeXi[S[3]] = 1;
+GaugeXi[S[4]] = 1;
+GaugeXi[S[5]] = 1;
+
+(* Need both of these terms to use the pip and kp field names *)
+(* Note that FeynRules automatically creates the k0bar conjugate field *)
+pip = anti[pim];
+pipbar = pim;
+kp = anti[km];
+kpbar = km;
+
+FpiExpand[expr_, n_] := Normal[Series[expr, {fpi, Infinity, n}]];
+
+commutator[AA_, BB_] := AA . BB - BB . AA;
+
+(* Mass matrix of the light quarks *)
+QuarkMassMatrix = DiagonalMatrix[{muq, mdq, msq}];
+(* Matrix of quark charges *)
+QuarkChargeMatrix = DiagonalMatrix[{2/3, -1/3, -1/3}];
+(* Matrix of V-quark couplings *)
+VecCouplingMatrix = DiagonalMatrix[{gvuu, gvdd, gvss}];
+(* Components of CKM matrix relevant to K0 -> pi l nu decay *)
+CKM := {{0, Vud, Vus}, {0, 0, 0}, {0, 0, 0}};
+
+(*** Set up building blocks for the Lagrangian ***)
+(* Matrix of mesons *)
+(* Set eta-eta' mixing angle to 0 for now! *)
+Phi = {{pi0 + eta / Sqrt[3], Sqrt[2] * pip, Sqrt[2] * kp},
+        {Sqrt[2] * pim, -pi0 + eta / Sqrt[3], Sqrt[2] * k0},
+        {Sqrt[2] * km, Sqrt[2] * k0bar, -2 * eta / Sqrt[3]}};
+
+(* Golstone Matrix *)
+Sigma[order_] := Block[{coeff},
+    coeff[n_] := (1 / Factorial[n]) * (I / fpi)^n;
+    (* If order is 0, return Identity. Else, do sum up to order. *)
+    If[order == 0, IdentityMatrix[3],
+    IdentityMatrix[3] + Sum[coeff[n] * MatrixPower[Phi, n], {n, 1, order}]]
+];
+
+(* Square Root of the Golstone Matrix *)
+SqrtSigma[order_] := Block[{coeff},
+    coeff[n_] := (1 / Factorial[n]) * (I / fpi)^n;
+    (* If order is 0, return Identity. Else, do sum up to order. *)
+    If[order == 0, IdentityMatrix[3],
+    IdentityMatrix[3] + Sum[coeff[n] * MatrixPower[Phi / 2, n], {n, 1, order}]]
+];
+
+(* Convenient definitions *)
+Sigma3 = Sigma[3];
+Sigma4 = Sigma[4];
+SigmaDag3 = HC[Sigma[3]];
+SigmaDag4 = HC[Sigma[4]];
+
+SqrtSigma3 = SqrtSigma[3];
+SqrtSigma4 = SqrtSigma[4];
+SqrtSigmaDag2 = HC[SqrtSigma[2]];
+SqrtSigmaDag3 = HC[SqrtSigma[3]];
+SqrtSigmaDag4 = HC[SqrtSigma[4]];
+
+(* Define left and right handed vector fields *)
+EMCurrentL[m_] := qe * QuarkChargeMatrix * A[m];
+EMCurrentR[m_] := qe * QuarkChargeMatrix * A[m];
+
+(* 4-Fermi contribution *)
+WeakCurrentL[m_] := 2 * Sqrt[2] * GF *  CKM * lbar . Ga[m] . ProjM . vl;
+
+(* Vector mediator contribution *)
+VecCurrentL[m_] := Vec[m] VecCouplingMatrix;
+VecCurrentR[m_] := Vec[m] VecCouplingMatrix;
+
+lhNoWeak[m_] := EMCurrentL[m] + VecCurrentL[m];
+rhNoWeak[m_] := EMCurrentR[m] + VecCurrentR[m];
+
+lh[m_] := lhNoWeak[m] + WeakCurrentL[m] + HC[WeakCurrentL[m]];
+rh[m_] := rhNoWeak[m];
+
+vmu[m_] := 1 / 2 * (rh[m] + lh[m]);
+amu[m_] := 1 / 2 * (rh[m] - lh[m]);
+
+(* Define covariant derivative of Sigma matrix *)
+DCS[FF_, m_] := del[FF, m] - I * rh[m] . FF + I * FF . lh[m];
+
+(* Hermitian conjugate of covariant derivative *)
+HCDCS[FF_, m_] := HC[DCS[FF, m]];
+
+(* Resonance matrix *)
+ResonanceMatrix[m_] := {{rho[m] / Sqrt[2] + omega[m] / Sqrt[6], 0, 0}, {0, -rho[m] / Sqrt[2] + omega[m] / Sqrt[6], 0}, {0, 0, -2 omega[m] / Sqrt[6]}};
+
+(* Connection to define the resonance covariant derivative *)
+ResConnection[m_] := Block[{derTerm1, derTerm2, curTerm1, curTerm2, tot},
+    derTerm1 = 1 / 2 * SqrtSigmaDag3 . del[SqrtSigma4, m];
+    curTerm1 = -I / 2 * SqrtSigmaDag4 . rhNoWeak[m] . SqrtSigma4;
+
+    derTerm2 = 1 / 2 * SqrtSigma3 . del[SqrtSigmaDag4, m];
+    curTerm2 = -I / 2 * SqrtSigma4 . lhNoWeak[m] . SqrtSigmaDag4;
+
+    tot = derTerm1 + derTerm2 + curTerm1 + curTerm2;
+
+    FpiExpand[tot, 3]
+];
+
+(* Resonance Field Strength *)
+ResonanceFS[m_, n_] := Block[{derivTerm, connectTerm1, connectTerm2, tot},
+    derivTerm = del[ResonanceMatrix[n], m] - del[ResonanceMatrix[m], n];
+
+    (* These are already expanded to O(f^-3) *)
+    connectTerm1 = commutator[ResConnection[m], ResonanceMatrix[n]];
+    connectTerm2 = commutator[ResConnection[n], ResonanceMatrix[m]];
+
+    tot = derivTerm + connectTerm1 + connectTerm2
+];
+
+(* Octet tensor current, dropping leptonic terms *)
+FSRight[m_, n_] := FS[rhNoWeak, m, n];
+FSLeft[m_, n_] := FS[lhNoWeak, m, n];
+
+FSOctetLeft[m_, n_] := SqrtSigma4 . FSLeft[m, n] . SqrtSigmaDag4;
+FSOctetRight[m_, n_] := SqrtSigmaDag4 . FSRight[m, n] . SqrtSigma4;
+
+FSOctetPlus[m_, n_] := FSOctetLeft[m, n] + FSOctetRight[m, n];
+FSOctetMinus[m_, n_] := FSOctetLeft[m, n] - FSOctetRight[m, n];
+
+(* Octet meson current *)
+SqrtSigmaMu[m_] := I * SqrtSigmaDag2 . DCS[Sigma4, m] . SqrtSigmaDag2;
+
+(* J2 resonance interaction term *)
+ResonanceJ2[m_, n_] := -fv / (2 * Sqrt[2]) * FSOctetPlus[m, n] - I * gv / Sqrt[2] SqrtSigmaMu[m] . SqrtSigmaMu[n];
+
+(*****************************************************************)
+(*****************************************************************)
+(*                        Lagrangian                             *)
+(*****************************************************************)
+(*****************************************************************)
+
+(*****************************************************************)
+(*                        Kinetic Terms                          *)
+(*****************************************************************)
+
+(* Vector *)
+LKineticVec := Block[{m, n, kinetic, mass},
+    kinetic = -1 / 4 * FS[Vec, m, n] FS[Vec, m, n];
+    mass = mv^2 / 2 * Vec[m] Vec[m];
+
+    kinetic + mass
+];
+
+(* DM *)
+LKineticDM := Block[{m},
+    I * (xbar . Ga[m] . del[x, m] - mx * xbar . x)
+];
+
+(* Mesons Kinetic Term *)
+LKineticMes := Block[{m, kinetic},
+    kinetic = fpi^2 / 4 * Tr[DCS[Sigma4, m] . HCDCS[Sigma4, m]];
+
+    FpiExpand[kinetic, 4]
+];
+
+(* Mesons Mass Term *)
+LMassMes := b0 * fpi^2 / 2 * Tr[QuarkMassMatrix . (Sigma4 + SigmaDag4)];
+
+(* Photon kinetic term *)
+LGauge := Block[{m, n},
+    -1 / 4 * FS[A, m, n] FS[A, m, n]
+];
+
+(* Neutrino kinetic term *)
+LKineticNu := Block[{m},
+    I * left[nubar] . Ga[m] . del[left[n], m]
+];
+
+(* Photon-l interaction *)
+LKineticLep := Block[{m},
+    I * (lbar . Ga[m] . DC[l, m] - ml lbar . l)
+];
+
+LKineticRho := Block[{m, n, kinetic, mass},
+    kinetic = -1 / 4 * Tr[ResonanceFS[m, n] . ResonanceFS[m, n]];
+    mass = mVectorRes^2 / 2 * Tr[ResonanceMatrix[m] . ResonanceMatrix[m]];
+
+    kinetic + mass;
+
+    FpiExpand[kinetic + mass, 3]
+];
+
+LKinetic := LKineticVec + LKineticDM + LKineticMes + LMassMes + LGauge + LKineticNu +  LKineticLep + LKineticRho;
+
+
+(*****************************************************************)
+(*                   Interaction Terms                           *)
+(*****************************************************************)
+
+(* V-l interaction *)
+LIntVLL := Block[{m},
+    gvll Vec[m] lbar . Ga[m] . l
+];
+
+(* V-x interaction *)
+LIntVXX := Block[{m},
+    gvxx Vec[m] xbar . Ga[m] . x
+];
+
+(* Rho-pi-pi terms *)
+LIntRhoMes := Block[{m, n},
+    1 / mVectorRes Tr[ResonanceFS[m, n] . ResonanceJ2[m, n]] // FpiExpand[#, 2]&
+];
+
+(* pi-pi-gamma contact interactions required to correct the rho propagator *)
+LContactRho := Block[{m, n},
+    -rhoContactCoeff / mVectorRes^2 Tr[ResonanceJ2[m, n] . ResonanceJ2[m, n]] // FpiExpand[#, 4]&
+];
+
+(* WZW Lagrangian, ignoring terms from the weak LH current *)
+scSigmaL[m_] := SigmaDag3 . del[Sigma4, m];
+scSigmaR[m_] := Sigma3 . HC[del[Sigma4, m]];
+
+z1[m_, n_, r_, s_] := 1/2 Sigma4 . lhNoWeak[m] . SigmaDag4 . rhNoWeak[n] . Sigma4 . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s];
+z2[m_, n_, r_, s_] := Sigma4 . lhNoWeak[m] . lhNoWeak[n] . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s] - SigmaDag4 . rhNoWeak[m] . rhNoWeak[n] . rhNoWeak[r] . Sigma4 . lhNoWeak[s];
+z3[m_, n_, r_, s_] := I Sigma4 . del[lhNoWeak[n], m] . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s] - I SigmaDag4 . del[rhNoWeak[n], m] . rhNoWeak[r] . Sigma4 . lhNoWeak[s];
+z4[m_, n_, r_, s_] := I del[rhNoWeak[n], m] . Sigma4 . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s] - I del[lhNoWeak[n], m] . SigmaDag4 . rhNoWeak[r] . Sigma4 . lhNoWeak[s];
+z5[m_, n_, r_, s_] := -I scSigmaL[m] . lhNoWeak[n] . SigmaDag3 . rhNoWeak[r] . Sigma3 . lhNoWeak[s] + I scSigmaR[m] . rhNoWeak[n] . Sigma3 . lhNoWeak[r] . SigmaDag3 . rhNoWeak[s];
+z6[m_, n_, r_, s_] := -I scSigmaL[m] . lhNoWeak[n] . lhNoWeak[r] . lhNoWeak[s] + I scSigmaR[m] . rhNoWeak[n] . rhNoWeak[r] . rhNoWeak[s];
+z7[m_, n_, r_, s_] := 1/2 scSigmaL[m] . SigmaDag3 . del[rhNoWeak[r], n] . Sigma3 . lhNoWeak[s] - 1/2 scSigmaR[m] . Sigma3 . del[lhNoWeak[r], n] . SigmaDag3 . rhNoWeak[s];
+z8[m_, n_, r_, s_] := 1/2 scSigmaL[m] . SigmaDag3 . rhNoWeak[n] . Sigma3 . del[lhNoWeak[s], r] - 1/2 scSigmaR[m] . Sigma3 . lhNoWeak[n] . SigmaDag3 . del[rhNoWeak[s], r];
+z9[m_, n_, r_, s_] := -scSigmaL[m] . scSigmaL[n] . SigmaDag3 . rhNoWeak[r] . Sigma3 . lhNoWeak[s] + scSigmaR[m] . scSigmaR[n] . Sigma3 . lhNoWeak[r] . SigmaDag3 . rhNoWeak[s];
+z10[m_, n_, r_, s_] := scSigmaL[m] . lhNoWeak[n] . del[lhNoWeak[s], r] - scSigmaR[m] . rhNoWeak[n] . del[rhNoWeak[s], r];
+z11[m_, n_, r_, s_] := scSigmaL[m] . del[lhNoWeak[r], n] . lhNoWeak[s] - scSigmaR[m] . del[rhNoWeak[r], n] . rhNoWeak[s];
+z12[m_, n_, r_, s_] := 1/2 scSigmaL[m] . lhNoWeak[n] . scSigmaL[r] . lhNoWeak[s] - 1/2 scSigmaR[m] . rhNoWeak[n] . scSigmaR[r] . rhNoWeak[s];
+z13[m_, n_, r_, s_] := -I scSigmaL[m] . scSigmaL[n] . scSigmaL[r] . lhNoWeak[s] + I scSigmaR[m] . scSigmaR[n] . scSigmaR[r] . rhNoWeak[s];
+
+z[m_, n_, r_, s_] := z1[m, n, r, s] + z2[m, n, r, s] + z3[m, n, r, s] + z4[m, n, r, s] + z5[m, n, r, s] + z6[m, n, r, s] + z7[m, n, r, s] + z8[m, n, r, s] + z9[m, n, r, s] + z10[m, n, r, s] + z11[m, n, r, s] + z12[m, n, r, s] + z13[m, n, r, s];
+
+LWZW := Block[{m, n, r, s, coeff},
+     (* This is positive since I'm using P&S and Schwartz' sign convention for Eps! Shouldn't affect anything since none of the amplitudes coming from L_WZW interfere with amplitudes coming from the rest of the Lagrangian. *)
+    coeff = I / (48 Pi^2);
+
+    3 coeff Eps[m, n, r, s] Tr[FpiExpand[z[m, n, r, s], 3]]
+];
+
+
+LInt := LIntVLL + LIntVXX + LIntRhoMes + LWZW + LContactRho;
+
+
+
+(* Full Lagrangian *)
+L := LKinetic + LInt // ReplaceAll[#, {GF -> fCounter GF}]& // Series[#, {fCounter, 0, 1}]& // Normal // ReplaceAll[#, {fCounter -> 1}]&;

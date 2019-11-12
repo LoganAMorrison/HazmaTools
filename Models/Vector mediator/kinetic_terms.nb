@@ -1,0 +1,341 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     10687,        332]
+NotebookOptionsPosition[     10131,        308]
+NotebookOutlinePosition[     10485,        324]
+CellTagsIndexPosition[     10442,        321]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"D\[Mu]\[CapitalSigma]EM", "=", 
+   RowBox[{"d\[Mu]\[CapitalSigma]", "+", 
+    RowBox[{"\[ImaginaryI]", " ", "e", " ", "A\[Mu]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"\[CapitalSigma]", ".", "Qq"}], "-", 
+       RowBox[{"Qq", ".", "\[CapitalSigma]"}]}], ")"}]}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"D\[Mu]\[CapitalSigma]", "=", 
+   RowBox[{"D\[Mu]\[CapitalSigma]EM", "+", 
+    RowBox[{"\[ImaginaryI]", " ", "V\[Mu]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"\[CapitalSigma]", ".", "gVq"}], "-", 
+       RowBox[{"gVq", ".", "\[CapitalSigma]"}]}], ")"}]}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"D\[Mu]\[CapitalSigma]dagEM", "=", 
+   RowBox[{"d\[Mu]\[CapitalSigma]dag", "-", 
+    RowBox[{"\[ImaginaryI]", " ", "e", " ", "A\[Mu]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"Qq", ".", "\[CapitalSigma]dag"}], "-", 
+       RowBox[{"\[CapitalSigma]dag", ".", "Qq"}]}], ")"}]}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"D\[Mu]\[CapitalSigma]dag", "=", 
+   RowBox[{"D\[Mu]\[CapitalSigma]dagEM", "-", 
+    RowBox[{"\[ImaginaryI]", " ", "V\[Mu]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"gVq", ".", "\[CapitalSigma]dag"}], "-", 
+       RowBox[{"\[CapitalSigma]dag", ".", "gVq"}]}], ")"}]}]}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.747223911062272*^9, 3.747224051153431*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"gVqSub", "=", 
+   RowBox[{"{", 
+    RowBox[{"gVq", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"gVu", ",", "0", ",", "0"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "gVd", ",", "0"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0", ",", "gVs"}], "}"}]}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"EMSub", "=", 
+   RowBox[{"{", 
+    RowBox[{"Qq", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"Qu", ",", "0", ",", "0"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "Qd", ",", "0"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0", ",", "Qs"}], "}"}]}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"\[Phi]", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"\[Pi]0", ",", 
+       RowBox[{
+        SqrtBox["2"], "\[Pi]p"}], ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{
+        SqrtBox["2"], "\[Pi]m"}], ",", 
+       RowBox[{"-", "\[Pi]0"}], ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"d\[Mu]\[Phi]", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"d\[Mu]\[Pi]0", ",", 
+       RowBox[{
+        SqrtBox["2"], "d\[Mu]\[Pi]p"}], ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{
+        SqrtBox["2"], "d\[Mu]\[Pi]m"}], ",", 
+       RowBox[{"-", "d\[Mu]\[Pi]0"}], ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"\[CapitalSigma]Subs", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"\[CapitalSigma]", "\[Rule]", 
+      RowBox[{
+       RowBox[{"IdentityMatrix", "[", "3", "]"}], "+", 
+       RowBox[{
+        FractionBox["\[ImaginaryI]", "f"], "\[Phi]"}]}]}], ",", 
+     RowBox[{"\[CapitalSigma]dag", "\[Rule]", 
+      RowBox[{
+       RowBox[{"IdentityMatrix", "[", "3", "]"}], "-", 
+       RowBox[{
+        FractionBox["\[ImaginaryI]", "f"], "\[Phi]"}]}]}], ",", 
+     RowBox[{"d\[Mu]\[CapitalSigma]", "\[Rule]", 
+      RowBox[{
+       RowBox[{"IdentityMatrix", "[", "3", "]"}], "+", 
+       RowBox[{
+        FractionBox["\[ImaginaryI]", "f"], "d\[Mu]\[Phi]"}]}]}], ",", 
+     RowBox[{"d\[Mu]\[CapitalSigma]dag", "\[Rule]", 
+      RowBox[{
+       RowBox[{"IdentityMatrix", "[", "3", "]"}], "-", 
+       RowBox[{
+        FractionBox["\[ImaginaryI]", "f"], "d\[Mu]\[Phi]"}]}]}]}], "}"}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.747225588541699*^9, 3.747225648685247*^9}, {
+  3.747225694970323*^9, 3.7472257651240892`*^9}, {3.747225809690256*^9, 
+  3.747225853892095*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     FractionBox[
+      SuperscriptBox["f", "2"], "4"], 
+     RowBox[{"Tr", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+            "D\[Mu]\[CapitalSigma]", ".", "D\[Mu]\[CapitalSigma]dag"}], ")"}],
+            "-", 
+           RowBox[{"(", 
+            RowBox[{
+            "D\[Mu]\[CapitalSigma]EM", ".", "D\[Mu]\[CapitalSigma]dagEM"}], 
+            ")"}]}], ")"}], "/.", "gVqSub"}], "/.", "EMSub"}], "/.", 
+       "\[CapitalSigma]Subs"}], "]"}]}], "//", 
+    RowBox[{
+     RowBox[{"Series", "[", 
+      RowBox[{"#", ",", 
+       RowBox[{"{", 
+        RowBox[{"V\[Mu]", ",", "0", ",", "2"}], "}"}]}], "]"}], "&"}]}], "//",
+    "FullSimplify"}], "//", "Normal"}]], "Input",
+ CellChangeTimes->{{3.7472239888508053`*^9, 3.747224003921357*^9}, {
+   3.747224063744293*^9, 3.747224100816298*^9}, {3.747224135843437*^9, 
+   3.747224171180543*^9}, {3.747225564681924*^9, 3.747225584120195*^9}, {
+   3.747225769871735*^9, 3.747225796939315*^9}, {3.747225857501762*^9, 
+   3.747225886842884*^9}, {3.7472259319641943`*^9, 3.747225979027835*^9}, {
+   3.747226058033846*^9, 3.747226059097159*^9}, {3.747226132042461*^9, 
+   3.747226153068346*^9}, 3.7473963845676517`*^9}],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"\[Pi]m", " ", "\[Pi]p", " ", 
+    SuperscriptBox["V\[Mu]", "2"], " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{"gVd", "-", "gVu"}], ")"}], "2"]}], "+", 
+   RowBox[{"V\[Mu]", " ", 
+    RowBox[{"(", 
+     RowBox[{"gVd", "-", "gVu"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"2", " ", "A\[Mu]", " ", "e", " ", "\[Pi]m", " ", "\[Pi]p", " ", 
+       RowBox[{"(", 
+        RowBox[{"Qd", "-", "Qu"}], ")"}]}], "+", 
+      RowBox[{"\[ImaginaryI]", " ", "d\[Mu]\[Pi]m", " ", "\[Pi]p"}], "-", 
+      RowBox[{"\[ImaginaryI]", " ", "d\[Mu]\[Pi]p", " ", "\[Pi]m"}]}], 
+     ")"}]}]}], TraditionalForm]], "Output",
+ CellChangeTimes->{{3.747226133399157*^9, 3.7472261534218817`*^9}, 
+   3.747396345175405*^9, 3.747396385095084*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"%", "//", "StandardForm"}]], "Input",
+ CellChangeTimes->{{3.7472249231214523`*^9, 3.747224924523324*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"-", "\[ImaginaryI]"}], " ", 
+   RowBox[{"d\[Mu]\[CapitalSigma]", ".", 
+    RowBox[{"(", 
+     RowBox[{"V\[Mu]", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"gVq", ".", "\[CapitalSigma]dag"}], "-", 
+        RowBox[{"\[CapitalSigma]dag", ".", "gVq"}]}], ")"}]}], ")"}]}]}], "+", 
+  RowBox[{"\[ImaginaryI]", " ", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"V\[Mu]", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", 
+         RowBox[{"gVq", ".", "\[CapitalSigma]"}]}], "+", 
+        RowBox[{"\[CapitalSigma]", ".", "gVq"}]}], ")"}]}], ")"}], ".", 
+    "d\[Mu]\[CapitalSigma]dag"}]}], "+", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"V\[Mu]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", 
+        RowBox[{"gVq", ".", "\[CapitalSigma]"}]}], "+", 
+       RowBox[{"\[CapitalSigma]", ".", "gVq"}]}], ")"}]}], ")"}], ".", 
+   RowBox[{"(", 
+    RowBox[{"V\[Mu]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"gVq", ".", "\[CapitalSigma]dag"}], "-", 
+       RowBox[{"\[CapitalSigma]dag", ".", "gVq"}]}], ")"}]}], ")"}]}], "+", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"V\[Mu]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", 
+        RowBox[{"gVq", ".", "\[CapitalSigma]"}]}], "+", 
+       RowBox[{"\[CapitalSigma]", ".", "gVq"}]}], ")"}]}], ")"}], ".", 
+   RowBox[{"(", 
+    RowBox[{"A\[Mu]", " ", "e", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"Qq", ".", "\[CapitalSigma]dag"}], "-", 
+       RowBox[{"\[CapitalSigma]dag", ".", "Qq"}]}], ")"}]}], ")"}]}], "+", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"A\[Mu]", " ", "e", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", 
+        RowBox[{"Qq", ".", "\[CapitalSigma]"}]}], "+", 
+       RowBox[{"\[CapitalSigma]", ".", "Qq"}]}], ")"}]}], ")"}], ".", 
+   RowBox[{"(", 
+    RowBox[{"V\[Mu]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"gVq", ".", "\[CapitalSigma]dag"}], "-", 
+       RowBox[{"\[CapitalSigma]dag", ".", "gVq"}]}], ")"}]}], 
+    ")"}]}]}]], "Output",
+ CellChangeTimes->{3.747224925051725*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"V\[Mu]", " ", "A\[Mu]", " ", "e", " ", 
+   RowBox[{"Tr", "[", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"\[CapitalSigma]", ".", "gVq"}], "-", 
+       RowBox[{"gVq", ".", "\[CapitalSigma]"}]}], ")"}], ".", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"Qq", ".", "\[CapitalSigma]dag"}], "-", 
+       RowBox[{"\[CapitalSigma]dag", ".", "Qq"}]}], ")"}]}], "]"}]}], "+", 
+  RowBox[{"V\[Mu]", " ", "A\[Mu]", " ", "e", " ", 
+   RowBox[{"Tr", "[", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"\[CapitalSigma]", ".", "Qq"}], "-", 
+       RowBox[{"Qq", ".", "\[CapitalSigma]"}]}], ")"}], ".", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"gVq", ".", "\[CapitalSigma]dag"}], "-", 
+       RowBox[{"\[CapitalSigma]dag", ".", "gVq"}]}], ")"}]}], 
+    "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.74722493768857*^9, 3.747224987297552*^9}}]
+},
+WindowSize->{720, 855},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
+2013)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 1417, 37, 80, "Input"],
+Cell[1977, 59, 2828, 86, 177, "Input"],
+Cell[CellGroupData[{
+Cell[4830, 149, 1318, 34, 70, "Input"],
+Cell[6151, 185, 795, 20, 34, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6983, 210, 129, 2, 28, "Input"],
+Cell[7115, 214, 2090, 64, 80, "Output"]
+}, Open  ]],
+Cell[9220, 281, 907, 25, 46, "Input"]
+}
+]
+*)
+
+(* End of internal cache information *)

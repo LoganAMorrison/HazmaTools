@@ -26,7 +26,7 @@ Note that switching the model in the middle of a session should work. You may ha
 DarkMatter/AntiDarkMatter
 NeutralPion
 ChargedPionM/ChargedPionP
-Lepton/AntiLepton
+Lepton/AntiLepton (* stands for muon or electron *)
 Photon
 ScalarMediator (* scalar model only *)
 VectorMediator (* vector model only *)
