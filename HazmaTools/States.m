@@ -55,6 +55,7 @@ Photon::usage="FeynArts state for photon";
 ZBoson::usage="FeynArts state for Z";
 WBosonM::usage="FeynArts state for W-";
 WBosonP::usage="FeynArts state for W+";
+Gluon::usage="FeynArts state for gluons";
 Higgs::usage="FeynArts state for Higgs";
 GoldstoneZBoson::usage="FeynArts state for Golstone associated with Z";
 GoldstoneWBosonM::usage="FeynArts state for Golstone associated with W-";
@@ -152,6 +153,7 @@ StateInModelQ[AntiBottomQuark] := MemberQ[{"SM","SMQCD"}, HazmaTools`$HazmaModel
 StateInModelQ[ZBoson] := MemberQ[{"SM","SMQCD"}, HazmaTools`$HazmaModel];
 StateInModelQ[WBosonM] := MemberQ[{"SM","SMQCD"}, HazmaTools`$HazmaModel];
 StateInModelQ[WBosonP] := MemberQ[{"SM","SMQCD"}, HazmaTools`$HazmaModel];
+StateInModelQ[Gluon] := MemberQ[{"SM","SMQCD"}, HazmaTools`$HazmaModel];
 
 StateInModelQ[Higgs] := MemberQ[{"SM","SMQCD"}, HazmaTools`$HazmaModel];
 StateInModelQ[GoldstoneZBoson] := MemberQ[{"SM","SMQCD"}, HazmaTools`$HazmaModel];
@@ -250,6 +252,7 @@ AntiBottomQuark=-FeynArts`F[4,{3}];
 ZBoson=FeynArts`V[2];
 WBosonM=FeynArts`V[3];
 WBosonP=-FeynArts`V[3];
+Gluon=-FeynArts`V[4];
 
 (* Higgs and Goldstones *)
 Higgs=FeynArts`S[1];

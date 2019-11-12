@@ -56,3 +56,11 @@ To compute dNdE, use:
 ```mathematica
 HazmaComputeDNDE[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton},Q]
 ```
+
+Alternatively, one can use:
+
+```mathematica
+HazmaComputeDNDE[{Lepton, AntiLepton}]
+```
+
+which will compute `ScalarMediator -> Lepton + AntiLepton`. Due to factorization of the amplitudes, this will produce the same result as `HazmaComputeDNDE[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton},Q]` after the appropriate replacements of the mediator mass with `Q` have been made.
