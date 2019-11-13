@@ -28,6 +28,7 @@ Do not include photon in list."
 Options[HazmaComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
   FeynArts`ExcludeParticles -> {Photon}
 };
@@ -52,7 +53,9 @@ HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width
   width = HazmaComputeWidth[
     mediator,
     outStates,
-    Adjacencies -> OptionValue[Adjacencies],
+    FeynArts`Adjacencies -> OptionValue[Adjacencies],
+    FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles]
   ];
@@ -68,12 +71,12 @@ HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width
     {Photon, outStates[[1]], outStates[[2]]},
     FeynArts`Adjacencies -> OptionValue[FeynArts`Adjacencies],
     FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
     (* ignore diagrams with internal photon. They are higher order in \[Alpha] *)
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
     FeynCalc`ChangeDimension -> 4,
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
     FeynCalc`IncomingMomenta -> {P},
-    List -> False,
     FeynCalc`OutgoingMomenta -> {p1, p2, p3},
     FeynCalc`SMP -> True
   ];
@@ -96,6 +99,7 @@ HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width
 Options[ScalarMediatorComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
   FeynArts`ExcludeParticles -> {Photon}
 };
@@ -128,12 +132,12 @@ ScalarMediatorComputeDNDE[inStates_, outStates_, Q_, OptionsPattern[]] := Module
     {outStates[[1]], outStates[[2]], Photon},
     FeynArts`Adjacencies -> OptionValue[FeynArts`Adjacencies],
     FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
     (* ignore diagrams with internal photon. They are higher order in \[Alpha] *)
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
     FeynCalc`ChangeDimension -> 4,
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
     FeynCalc`IncomingMomenta -> {p1, p2},
-    List -> False,
     FeynCalc`OutgoingMomenta -> {p3, p4, k},
     FeynCalc`SMP -> True
   ];
@@ -195,6 +199,7 @@ ScalarMediatorComputeDNDE[inStates_, outStates_, Q_, OptionsPattern[]] := Module
 Options[VectorMediatorComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
   FeynArts`ExcludeParticles -> {Photon}
 };
@@ -210,6 +215,7 @@ VectorMediatorComputeDNDE[inStates_, outStates_, Q_, OptionsPattern[]] := Module
     {statev},
     FeynArts`Adjacencies -> OptionValue[FeynArts`Adjacencies],
     FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
     FeynCalc`ChangeDimension -> 4,
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],

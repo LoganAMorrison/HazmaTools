@@ -11,14 +11,16 @@
 (* :Keywords: Hazma, Quantum Field Theory, FeynCalc, FeynArts *)
 (* :Discussion: File for computing amplitudes in the Hazma framework *)
 
-BeginPackage["HazmaTools`"]
+BeginPackage["HazmaTools`"];
 
 HazmaComputeAmplitude::usage = "HazmaComputeAmplitude[inState,outState] Compute the amplitude for \
-inState->outState"
+inState->outState";
 HazmaComputeAmplitudeSquared::usage = "HazmaComputeAmplitudeSquared[inState,outState] Compute the \
-squared amplitude for inState->outState"
+squared amplitude for inState->outState";
 
-Begin["`Private`"]
+Begin["`Private`"];
+
+(* TODO: Find a way to convert FCGV to SMP style *)
 
 Options[HazmaComputeAmplitude] := {
   FeynArts`LoopNumber -> 0,
@@ -27,19 +29,19 @@ Options[HazmaComputeAmplitude] := {
   FeynArts`ExcludeTopologies -> {FeynArts`Tadpoles, FeynArts`SelfEnergies, FeynArts`WFCorrections},
   FeynArts`InsertionLevel -> {FeynArts`Particles},
   FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`ChangeDimension -> 4,
   FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
-  FeynCalc`IncomingMomenta -> {},
-  List -> False,
-  FeynCalc`LoopMomenta -> {},
+  FeynCalc`IncomingMomenta -> OptionValue[FeynCalc`FCFAConvert, FeynCalc`IncomingMomenta],
+  System`List -> False,
+  FeynCalc`LoopMomenta -> OptionValue[FeynCalc`FCFAConvert, FeynCalc`LoopMomenta],
   FeynCalc`LorentzIndexNames -> {Global`\[Mu], Global`\[Nu], Global`\[Alpha], Global`\[Beta], Global`\[Rho], Global`\[Sigma]},
-  FeynCalc`OutgoingMomenta -> {},
+  FeynCalc`OutgoingMomenta -> OptionValue[FeynCalc`FCFAConvert, FeynCalc`OutgoingMomenta],
   FeynCalc`SMP -> True,
-  FeynCalc`TransversePolarizationVectors -> {},
-  FeynCalc`UndoChiralSplittings -> True,
-  FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
-  FeynArts`PreFactor -> -I (2 \[Pi])^(-4 * FeynArts`LoopNumber),
-  FeynArts`Truncated -> False
+  FeynCalc`TransversePolarizationVectors -> OptionValue[FeynCalc`FCFAConvert, FeynCalc`TransversePolarizationVectors],
+  FeynArts`GaugeRules -> OptionValue[FeynArts`CreateFeynAmp, FeynArts`GaugeRules],
+  FeynArts`PreFactor -> OptionValue[FeynArts`CreateFeynAmp,FeynArts`PreFactor],
+  FeynArts`Truncated -> OptionValue[FeynArts`CreateFeynAmp, FeynArts`Truncated]
 };
 
 HazmaComputeAmplitude[inStates_, outStates_, OptionsPattern[]] := Module[{ampFA, ampFC, diagrams},
@@ -52,7 +54,8 @@ HazmaComputeAmplitude[inStates_, outStates_, OptionsPattern[]] := Module[{ampFA,
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
     FeynArts`ExcludeTopologies -> OptionValue[FeynArts`ExcludeTopologies],
     FeynArts`InsertionLevel -> OptionValue[FeynArts`InsertionLevel],
-    FeynArts`Paint -> OptionValue[FeynArts`Paint]
+    FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows]
   ];
 
   (*Compute the amplitude *)
@@ -68,7 +71,7 @@ HazmaComputeAmplitude[inStates_, outStates_, OptionsPattern[]] := Module[{ampFA,
     FeynCalc`OutgoingMomenta -> OptionValue[FeynCalc`OutgoingMomenta],
     FeynCalc`LorentzIndexNames -> OptionValue[FeynCalc`LorentzIndexNames],
     FeynCalc`LoopMomenta -> OptionValue[FeynCalc`LoopMomenta],
-    FeynCalc`UndoChiralSplittings -> OptionValue[FeynCalc`UndoChiralSplittings],
+    FeynCalc`UndoChiralSplittings -> True,
     FeynCalc`SMP -> OptionValue[FeynCalc`SMP],
     FeynCalc`ChangeDimension -> OptionValue[FeynCalc`ChangeDimension],
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
@@ -90,25 +93,19 @@ HazmaComputeAmplitude[inStates_, outStates_, OptionsPattern[]] := Module[{ampFA,
 
 
 Options[HazmaComputeAmplitudeSquared] := {
-  FeynArts`LoopNumber -> 0,
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`ExcludeParticles -> {},
   FeynArts`ExcludeTopologies -> {FeynArts`Tadpoles, FeynArts`SelfEnergies, FeynArts`WFCorrections},
   FeynArts`InsertionLevel -> {FeynArts`Particles},
   FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynArts`PreFactor -> -I (2 \[Pi])^(-4 FeynArts`LoopNumber),
-  FeynArts`Truncated -> False,
   FeynCalc`ChangeDimension -> 4,
   FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
   FeynCalc`IncomingMomenta -> {},
-  List -> False,
-  FeynCalc`LoopMomenta -> {},
-  FeynCalc`LorentzIndexNames -> {Global`\[Mu], Global`\[Nu], Global`\[Alpha], Global`\[Beta], Global`\[Rho], Global`\[Sigma]},
   FeynCalc`OutgoingMomenta -> {},
-  FeynCalc`SMP -> True,
-  FeynCalc`TransversePolarizationVectors -> {},
-  FeynCalc`UndoChiralSplittings -> True
+  FeynCalc`SMP -> True
 };
 
 
@@ -118,25 +115,19 @@ HazmaComputeAmplitudeSquared[inStates_, outStates_, OptionsPattern[]] := Module[
   amp = HazmaComputeAmplitude[
     inStates,
     outStates,
-    FeynArts`LoopNumber -> OptionValue[FeynArts`LoopNumber],
     FeynArts`Adjacencies -> OptionValue[FeynArts`Adjacencies],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
     FeynArts`ExcludeTopologies -> OptionValue[FeynArts`ExcludeTopologies],
     FeynArts`InsertionLevel -> OptionValue[FeynArts`InsertionLevel],
     FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
     FeynArts`GaugeRules -> OptionValue[FeynArts`GaugeRules],
     FeynArts`PreFactor -> OptionValue[FeynArts`PreFactor],
-    FeynArts`Truncated -> OptionValue[FeynArts`Truncated],
     FeynCalc`ChangeDimension -> OptionValue[FeynCalc`ChangeDimension],
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
     FeynCalc`IncomingMomenta -> OptionValue[FeynCalc`IncomingMomenta],
-    List -> OptionValue[List],
-    FeynCalc`LoopMomenta -> OptionValue[FeynCalc`LoopMomenta],
-    FeynCalc`LorentzIndexNames -> OptionValue[FeynCalc`LorentzIndexNames],
     FeynCalc`OutgoingMomenta -> OptionValue[FeynCalc`OutgoingMomenta],
-    FeynCalc`SMP -> OptionValue[FeynCalc`SMP],
-    FeynCalc`TransversePolarizationVectors -> OptionValue[FeynCalc`TransversePolarizationVectors],
-    FeynCalc`UndoChiralSplittings -> OptionValue[FeynCalc`UndoChiralSplittings]
+    FeynCalc`SMP -> OptionValue[FeynCalc`SMP]
   ];
 
   FeynCalc`ClearScalarProducts[];
@@ -182,12 +173,12 @@ HazmaComputeAmplitudeSquared[inStates_, outStates_, OptionsPattern[]] := Module[
   msqrd = ReplaceAll[msqrd, FeynCalc`DiracTrace -> FeynCalc`TR];
 
   (* If any of the states are vectors, do a sum over polarizations. *)
-  (* Add 1/2 (1/3) massless (massive) inital state vectrors *)
+  (* Add 1/2 (1/3) massless (massive) initial state vectors *)
   For[i = 1, i <= Length[inStates], i++,
     If[isVector[inStates[[i]]],
       If[FeynArts`TheMass[inStates[[i]]] === 0,
-        msqrd = (1 / 2)FeynCalc`DoPolarizationSums[msqrd, inMomenta[[i]], 0],
-        msqrd = (1 / 3)FeynCalc`DoPolarizationSums[msqrd, inMomenta[[i]]];
+        msqrd = (1 / 2) * FeynCalc`DoPolarizationSums[msqrd, inMomenta[[i]], 0],
+        msqrd = (1 / 3) * FeynCalc`DoPolarizationSums[msqrd, inMomenta[[i]]];
       ],
       Continue
     ];
@@ -210,6 +201,6 @@ HazmaComputeAmplitudeSquared[inStates_, outStates_, OptionsPattern[]] := Module[
 ];
 
 
-End[]
+End[];
 
-EndPackage[]
+EndPackage[];

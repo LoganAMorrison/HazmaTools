@@ -20,16 +20,13 @@ Begin["`Private`"]
 
 
 Options[HazmaComputeCrossSection22] := {
-  FeynArts`LoopNumber -> 0,
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`ExcludeParticles -> {},
-  FeynArts`ExcludeTopologies -> {FeynArts`Tadpoles, FeynArts`SelfEnergies, FeynArts`WFCorrections},
   FeynArts`InsertionLevel -> {FeynArts`Particles},
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynArts`Paint -> False,
-  FeynCalc`ChangeDimension -> 4,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
-  FeynCalc`LoopMomenta -> {},
   FeynCalc`SMP -> True
 };
 
@@ -39,17 +36,14 @@ HazmaComputeCrossSection22[inStates_, outStates_, Q_, OptionsPattern[]] := Modul
   msqrd = HazmaComputeAmplitudeSquared[
     inStates,
     outStates,
-    FeynArts`LoopNumber -> OptionValue[FeynArts`LoopNumber],
     FeynArts`Adjacencies -> OptionValue[FeynArts`Adjacencies],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
-    FeynArts`ExcludeTopologies -> OptionValue[FeynArts`ExcludeTopologies],
     FeynArts`InsertionLevel -> OptionValue[FeynArts`InsertionLevel],
     FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
     FeynArts`GaugeRules -> OptionValue[FeynArts`GaugeRules],
-    FeynCalc`ChangeDimension -> OptionValue[FeynCalc`ChangeDimension],
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
     FeynCalc`IncomingMomenta -> {p1, p2},
-    FeynCalc`LoopMomenta -> OptionValue[FeynCalc`LoopMomenta],
     FeynCalc`OutgoingMomenta -> {p3, p4},
     FeynCalc`SMP -> OptionValue[FeynCalc`SMP]
   ];
@@ -81,16 +75,15 @@ HazmaComputeCrossSection22[inStates_, outStates_, Q_, OptionsPattern[]] := Modul
 ];
 
 Options[HazmaComputeCrossSection22TimesVelocity] := {
-  FeynArts`LoopNumber -> 0,
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`ExcludeParticles -> {},
   FeynArts`ExcludeTopologies -> {FeynArts`Tadpoles, FeynArts`SelfEnergies, FeynArts`WFCorrections},
   FeynArts`InsertionLevel -> {FeynArts`Particles},
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`ChangeDimension -> 4,
   FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
-  FeynCalc`LoopMomenta -> {},
   FeynCalc`SMP -> True
 };
 
@@ -101,17 +94,16 @@ HazmaComputeCrossSection22TimesVelocity[inState_, outStates_, OptionsPattern[]] 
   msqrd = HazmaComputeAmplitudeSquared[
     {inState, -inState},
     outStates,
-    FeynArts`LoopNumber -> OptionValue[FeynArts`LoopNumber],
     FeynArts`Adjacencies -> OptionValue[FeynArts`Adjacencies],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
     FeynArts`ExcludeTopologies -> OptionValue[FeynArts`ExcludeTopologies],
     FeynArts`InsertionLevel -> OptionValue[FeynArts`InsertionLevel],
     FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
     FeynArts`GaugeRules -> OptionValue[FeynArts`GaugeRules],
     FeynCalc`ChangeDimension -> OptionValue[FeynCalc`ChangeDimension],
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
     FeynCalc`IncomingMomenta -> {p1, p2},
-    FeynCalc`LoopMomenta -> OptionValue[FeynCalc`LoopMomenta],
     FeynCalc`OutgoingMomenta -> {p3, p4},
     FeynCalc`SMP -> OptionValue[FeynCalc`SMP]
   ];

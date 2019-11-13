@@ -270,7 +270,6 @@ AntiGhostWBosonM=-FeynArts`U[3];
 GhostWBosonP=FeynArts`U[4];
 AntiGhostWBosonP=-FeynArts`U[5];
 
-
 End[]
 
 

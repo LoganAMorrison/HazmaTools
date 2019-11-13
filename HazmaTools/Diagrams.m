@@ -42,7 +42,8 @@ Options[HazmaGenerateDiagrams] = {
   FeynArts`ExcludeParticles -> {},
   FeynArts`ExcludeTopologies -> {FeynArts`Tadpoles, FeynArts`SelfEnergies, FeynArts`WFCorrections},
   FeynArts`InsertionLevel -> {FeynArts`Particles},
-  FeynArts`Paint -> False
+  FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows]
 };
 
 HazmaGenerateDiagrams[inStates_, outStates_, OptionsPattern[]] := Block[{tops, diags},
@@ -60,7 +61,7 @@ HazmaGenerateDiagrams[inStates_, outStates_, OptionsPattern[]] := Block[{tops, d
     FeynArts`GenericModel -> GetGenericModelName[],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles]
   ];
-  If[OptionValue[FeynArts`Paint], FeynArts`Paint[diags], FeynArts`SheetHeader -> None];
+  If[OptionValue[FeynArts`Paint], FeynArts`Paint[diags,FeynArts`ColumnsXRows->OptionValue[FeynArts`ColumnsXRows]], FeynArts`SheetHeader -> None];
   diags
 ]
 
