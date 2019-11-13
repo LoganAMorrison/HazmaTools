@@ -11,19 +11,19 @@
 (* :Keywords: Hazma, Quantum Field Theory, FeynCalc, FeynArts *)
 (* :Discussion: File for computing decay widths in the Hazma framework *)
 
-BeginPackage["HazmaTools`"]
+BeginPackage["HazmaTools`"];
 
 HazmaComputeWidth::usage = "HazmaComputeWidth[inState, outStates] Compute the partial decay width \
-of inState -> outState. Note inState must be of length 1 and outState must be of length 2 or 3."
+of inState -> outState. Note inState must be of length 1 and outState must be of length 2 or 3.";
 
 
-Begin["`Private`"]
+Begin["`Private`"];
 
 HazmaComputeWidth::InvalidInStates = "Invalid number of inStates passed to HazmaComputeWidth. Use \
-1 state."
+1 state.";
 
 HazmaComputeWidth::InvalidOutStates = "Invalid number of outStates passed to HazmaComputeWidth. Use \
-2 or 3 states."
+2 or 3 states.";
 
 Options[HazmaComputeWidth] = {
   FeynArts`Adjacencies -> {3, 4, 5},
@@ -165,7 +165,7 @@ HazmaComputeWidth13[inState_, outStates_, OptionsPattern[]] := Module[{msqrd, P,
 
 ];
 
-End[]
+End[];
 
 
 EndPackage[]

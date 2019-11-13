@@ -11,12 +11,12 @@
 (* :Keywords: Hazma, Quantum Field Theory, FeynCalc, FeynArts *)
 (* :Discussion: File for computing cross-sections in the Hazma framework *)
 
-BeginPackage["HazmaTools`"]
+BeginPackage["HazmaTools`"];
 
 HazmaComputeCrossSection22::usage = "HazmaComputeCrossSection22[]"
 HazmaComputeCrossSection22TimesVelocity::usage = "HazmaComputeCrossSection22TimesVelocity[]"
 
-Begin["`Private`"]
+Begin["`Private`"];
 
 
 Options[HazmaComputeCrossSection22] := {
@@ -138,7 +138,7 @@ HazmaComputeCrossSection22TimesVelocity[inState_, outStates_, OptionsPattern[]] 
 
 ];
 
-End[]
+End[];
 
 
 EndPackage[]

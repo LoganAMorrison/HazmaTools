@@ -11,19 +11,19 @@
 (* :Keywords: Hazma, Quantum Field Theory, FeynCalc, FeynArts *)
 (* :Discussion: File for computing gamma-ray spectra in the Hazma framework *)
 
-BeginPackage["HazmaTools`"]
+BeginPackage["HazmaTools`"];
 
 HazmaComputeDNDE::usage = "HazmaComputeDNDE[inStates, outStates, Q] or HazmaComputeDNDE[outStates] Compute the \
 differential radiative gamma-ray spectrum from inStates->outStates or mediator->outStates. Note that outStates should \
-not include Photon."
+not include Photon.";
 
 
-Begin["`Private`"]
+Begin["`Private`"];
 
-HazmaComputeDNDE::InvalidModel = "Implementation for model `1 not yet implemented"
+HazmaComputeDNDE::InvalidModel = "Implementation for model `1 not yet implemented";
 
 HazmaComputeDNDE::InvaliedOutStates = "Invalid outStates. Must be of length 2. \
-Do not include photon in list."
+Do not include photon in list.";
 
 Options[HazmaComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
@@ -336,6 +336,6 @@ VectorMediatorComputeDNDE[inStates_, outStates_, Q_, OptionsPattern[]] := Module
 
 
 
-End[]
+End[];
 
 EndPackage[]

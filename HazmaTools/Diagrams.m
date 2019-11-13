@@ -11,12 +11,12 @@
 (* :Keywords: Hazma, Quantum Field Theory, FeynCalc, FeynArts *)
 (* :Discussion: File for computing diagrams from FeynArts in the Hazma framework *)
 
-BeginPackage["HazmaTools`"]
+BeginPackage["HazmaTools`"];
 
 HazmaGenerateDiagrams::usage = "HazmaGenerateDiagrams[inStates, outStates] Compute the diagrams\
-associated with the process inStates->outStates."
+associated with the process inStates->outStates.";
 
-Begin["`Private`"]
+Begin["`Private`"];
 
 GetModelName[] := Module[{},
   If[$HazmaModel === "scalar", Return[{"EFT_MeV_DM_scalar" <> "/" <> "EFT_MeV_DM_scalar"}]];
@@ -24,7 +24,7 @@ GetModelName[] := Module[{},
   If[$HazmaModel === "SM", Return["SM"]]; (*for testing*)
   If[$HazmaModel === "SMQCD", Return["SMQCD"]]; (*for testing*)
   Throw[$Failed, Abort::InvalidHazmaModel]
-]
+];
 
 
 GetGenericModelName[] := Module[{},
@@ -33,7 +33,7 @@ GetGenericModelName[] := Module[{},
   If[$HazmaModel === "SM", Return[OptionValue[FeynArts`InsertFields, FeynArts`GenericModel]]]; (*for testing*)
   If[$HazmaModel === "SMQCD", Return[OptionValue[FeynArts`InsertFields, FeynArts`GenericModel]]]; (*for testing*)
   Throw[$Failed, Abort::InvalidHazmaModel]
-]
+];
 
 
 Options[HazmaGenerateDiagrams] = {
@@ -61,10 +61,10 @@ HazmaGenerateDiagrams[inStates_, outStates_, OptionsPattern[]] := Block[{tops, d
     FeynArts`GenericModel -> GetGenericModelName[],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles]
   ];
-  If[OptionValue[FeynArts`Paint], FeynArts`Paint[diags,FeynArts`ColumnsXRows->OptionValue[FeynArts`ColumnsXRows]], FeynArts`SheetHeader -> None];
+  If[OptionValue[FeynArts`Paint], FeynArts`Paint[diags, FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows]], FeynArts`SheetHeader -> None];
   diags
-]
+];
 
-End[]
+End[];
 
 EndPackage[]
