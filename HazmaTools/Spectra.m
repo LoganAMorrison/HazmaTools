@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (* Mathematica Package *)
 
 (* :Title: Spectra *)
@@ -33,15 +35,15 @@ Options[HazmaComputeDNDE] := {
   FeynArts`ExcludeParticles -> {Photon}
 };
 
-HazmaComputeDNDE[inStates_, outStates_, Q_, opt : OptionsPattern[]] := Module[{},
+(*HazmaComputeDNDE[inStates_, outStates_, Q_, opt : OptionsPattern[]] := Module[{},
   If[$HazmaModel === "scalar", Return[ScalarMediatorComputeDNDE[inStates, outStates, Q, opt]]];
   If[$HazmaModel === "vector", Return[VectorMediatorComputeDNDE[inStates, outStates, Q, opt]]];
   Message[HazmaComputeDNDE::InvalidModel, $HazmaModel];
   Throw[$Failed]
-];
+];*)
 
 
-HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width, P, p1, p2, p3, M, m1, m2, m3, s, t, u, tub, tlb, tintegral, dndE, preFactor},
+HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width, P, p1, p2, p3, M, m1, m2, m3, s, t, u, tub, tlb, tintegral, dndE, preFactor, result},
   If[Length[outStates] != 2,
     Message[HazmaComputeDNDE::InvaliedOutStates];
     Throw[$Failed]
@@ -59,7 +61,7 @@ HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width
     FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
     FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles]
   ];
-
+  
   (* Determine masses *)
   M = FeynArts`TheMass[mediator];
   m1 = 0;
@@ -86,7 +88,7 @@ HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width
 
   {tub, tlb} = ComputeMandelstamTBound[M, m1, m2, m3, s, t];
   tintegral = Integrate[msqrd, t, GenerateConditions -> False];
-  tintegral = Simplify[(tintegral /. tub) - (tintegral /. tlb), Assumptions -> {M > 0, M > m2 + m3 > 0}];
+  tintegral = (tintegral /. tub) - (tintegral /. tlb)(*, Assumptions -> {M > 0, M > m2 + m3 > 0}*);
 
   preFactor = -1 / (16 * M^2 * (2 * Pi)^3) * 1 / width;
   dndE = tintegral * preFactor;
@@ -96,7 +98,7 @@ HazmaComputeDNDE[outStates_, OptionsPattern[]] := Module[{mediator, msqrd, width
 ];
 
 
-Options[ScalarMediatorComputeDNDE] := {
+(*Options[ScalarMediatorComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
@@ -191,12 +193,12 @@ ScalarMediatorComputeDNDE[inStates_, outStates_, Q_, OptionsPattern[]] := Module
   (* Convert s to E => s = (Q^2-2*Q*E) *)
   dndE = ReplaceAll[dndE, {s -> Q^2 - 2 * Q * Global`E\[Gamma], Global`qe -> Sqrt[4 * Pi * Global`alphaEM]}];
   Simplify[dndE, Assumptions -> {Q > 0, Q - (m3 + m4)^2 / Q > 2 * Global`E\[Gamma] > 0, m1 > 0, m2 > 0, m3 > 0, m4 > 0}]
-];
+];*)
 
 
 
 
-Options[VectorMediatorComputeDNDE] := {
+(*Options[VectorMediatorComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
@@ -332,7 +334,7 @@ VectorMediatorComputeDNDE[inStates_, outStates_, Q_, OptionsPattern[]] := Module
   (* Convert s to E => s = (Q^2-2*Q*E) *)
   dndE = ReplaceAll[dndE, {s -> Q^2 - 2 * Q * Global`E\[Gamma], Global`qe -> Sqrt[4 * Pi * Global`alphaEM]}];
   Simplify[dndE, Assumptions -> {Q > 0, Q - (m3 + m4)^2 / Q > 2 * Global`E\[Gamma] > 0, m1 > 0, m2 > 0, m3 > 0, m4 > 0}]
-];
+];*)
 
 
 
