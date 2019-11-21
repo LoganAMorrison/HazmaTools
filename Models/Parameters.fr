@@ -1,0 +1,376 @@
+M$Parameters = {
+  (* ChiPT Parameters *)
+
+  fpi == {
+    ParameterType -> External,
+    Value -> 0.093,
+    TeX -> ComposedChar["f", "\\pi"],
+    Description -> "pion decay constant"
+  },
+
+  b0 == {
+    ParameterType -> External,
+    Description -> "mass term coefficient",
+    TeX -> ComposedChar["B", "0"],
+    Value -> 2.617 (* ((mpi0 + mpi)/2)^2 / (mu + md) *)
+  },
+
+  fv == {
+    ParameterType -> External,
+    Description -> "vector coupling F_V",
+    TeX -> ComposedChar["F", "V"],
+    Value -> 0.165 (* MeV *)
+  },
+
+  gv == {
+    ParameterType -> External,
+    Description -> "vector coupling G_V",
+    TeX -> ComposedChar["G", "V"],
+    Value -> 0.055 (* MeV *)
+  },
+
+  mrho == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "\\rho"],
+    Description -> "rho0 mass"
+  },
+
+  rhowidth == {
+    ParameterType -> External,
+    TeX -> ComposedChar["\\Gamma", "\\rho"],
+    Description -> "rho0 width"
+  },
+
+  momega == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "\\omega"],
+    Description -> "omega mass"
+  },
+
+  omegawidth == {
+    ParameterType -> External,
+    TeX -> ComposedChar["\\Gamma", "\\omega"],
+    Description -> "omega width"
+  },
+
+  (* Standard Model Parameters *)
+
+  muq == {
+    ParameterType -> External,
+    Value -> 0.0024,
+    TeX -> ComposedChar["m", "u"],
+    Description -> "mass of the up quark"
+  },
+
+  mdq == {
+    ParameterType -> External,
+    Value -> 0.0048,
+    TeX -> ComposedChar["m", "d"],
+    Description -> "mass of the down quark"
+  },
+
+  msq == {
+    ParameterType -> External,
+    Value -> 0.095,
+    TeX -> ComposedChar["m", "s"],
+    Description -> "mass of the strange quark"
+  },
+
+  ml == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "l"],
+    Description -> "SM fermion mass"
+  },
+
+  me == {
+    ParameterType -> External,
+    Value -> 0.000511,
+    TeX -> ComposedChar["m", "e"],
+    Description -> "electron mass"
+  },
+
+  mmu == {
+    ParameterType -> External,
+    Value -> 0.10566,
+    TeX -> ComposedChar["m", "\\mu"],
+    Description -> "muon mass"
+  },
+
+  alphaEM == {
+    ParameterType -> External,
+    Value -> 1 / 137.0,
+    TeX -> ComposedChar["\\alpha", "EM"],
+    Description -> "fine structure constant for EM"
+  },
+
+  Vud == {
+    ParameterType -> External,
+    Value -> 0.974267,
+    TeX -> ComposedChar["V", "ud"],
+    Description -> "ud element of CKM matrix"
+  },
+
+  Vus == {
+    ParameterType -> External,
+    Value -> 0.225369,
+    TeX -> ComposedChar["V", "us"],
+    Description -> "us element of CKM matrix"
+  },
+
+  GF == {
+    ParameterType -> External,
+    Value -> 1.166 * 10^(-5), (* GeV^-2 *)
+    TeX -> ComposedChar["G", "F"],
+    Description -> "Fermi constant"
+  },
+
+  qe == {
+    ParameterType -> Internal,
+    Value -> Sqrt[4 Pi alphaEM],
+    TeX -> "e",
+    Description -> "electric coupling constant"
+  },
+
+  vh == {
+    ParameterType -> External,
+    TeX -> ComposedChar["v", "H"],
+    Description -> "Higgs vev",
+    Value -> 246.0
+  },
+
+  (* Dark Matter Parameters *)
+
+  mx == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "\\chi"],
+    Description -> "dark matter mass"
+  },
+
+  (* Scalar Mediator Parameters *)
+
+  gsuu == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Suu"],
+    Description -> "Scalar mediator-up quark coupling"
+  },
+
+  gsdd == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Sff"],
+    Description -> "Scalar mediator-down quark coupling"
+  },
+
+  gsss == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Sff"],
+    Description -> "Scalar mediator-strange quark coupling"
+  },
+
+  gsee == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Sff"],
+    Description -> "Scalar mediator-electron coupling"
+  },
+
+  gsll == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Sff"],
+    Description -> "Scalar mediator-lepton coupling"
+  },
+
+  gsGG == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "SGG"],
+    Description -> "effective SGG coupling"
+  },
+
+  gsFF == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "SFF"],
+    Description -> "effective SFF coupling"
+  },
+
+  vs == {
+    ParameterType -> External,
+    TeX -> ComposedChar["v", "S"],
+    Description -> "vev of S"
+  },
+
+  ms == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "S"],
+    Description -> "mass of S"
+  },
+
+  swidth == {
+    ParameterType -> External,
+    TeX -> ComposedChar["\\Gamma", "S"],
+    Description -> "width of S"
+  },
+
+  gsxx == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "S\\chi\\chi"],
+    Description -> "S\[Chi]\[Chi]C coupling"
+  },
+
+  Lam == {
+    ParameterType -> External,
+    TeX -> "\\Lambda",
+    Description -> "UV cutoff scale."
+  },
+
+  (* Vector Mediator Parameters *)
+
+  gvll == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Vll"],
+    Description -> "Sll coupling"
+  },
+
+  gvuu == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Vuu"],
+    Description -> "Suu coupling"
+  },
+
+  gvdd == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Vdd"],
+    Description -> "Sdd coupling"
+  },
+
+  gvss == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Vss"],
+    Description -> "Sss coupling"
+  },
+
+  mv == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "V"],
+    Description -> "mass of V"
+  },
+
+  vwidth == {
+    ParameterType -> External,
+    TeX -> ComposedChar["\\Gamma", "V"],
+    Description -> "width of V"
+  },
+
+  gvxx == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "V\\chi\\chi"],
+    Description -> "V\[Chi]\[Chi]C coupling"
+  },
+
+  (* Pseudo-Scalar Mediator Parameters *)
+
+  gpuu == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Puu"],
+    Description -> "Puu coupling"
+  },
+
+  gpdd == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Pdd"],
+    Description -> "Pdd coupling"
+  },
+
+  gpss == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Pss"],
+    Description -> "Pss coupling"
+  },
+
+  gpll == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Pll"],
+    Description -> "Pll coupling"
+  },
+
+  gpGG == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "PGG"],
+    Description -> "effective PGGdual coupling"
+  },
+
+  gpFF == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "PFF"],
+    Description -> "effective PFFdual coupling"
+  },
+
+  mp == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "P"],
+    Description -> "mass of P"
+  },
+
+  pwidth == {
+    ParameterType -> External,
+    TeX -> ComposedChar["\\Gamma", "P"],
+    Description -> "width of P"
+  },
+
+  gpxx == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "P\\chi\\chi"],
+    Description -> "P\[Chi]\[Chi] coupling"
+  },
+
+  sinbeta == {
+    ParameterType -> Internal,
+    TeX -> ComposedChar["Sin", "\\beta"]
+  },
+
+  cosbeta == {
+    ParameterType -> Internal,
+    TeX -> ComposedChar["Cos", "\\beta"]
+  },
+
+  (* Axial-Vector Mediator *)
+
+  gall == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "All"],
+    Description -> "All coupling"
+  },
+
+  gauu == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Auu"],
+    Description -> "Auu coupling"
+  },
+
+  gadd == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Add"],
+    Description -> "Add coupling"
+  },
+
+  gass == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "Ass"],
+    Description -> "Ass coupling"
+  },
+
+  ma == {
+    ParameterType -> External,
+    TeX -> ComposedChar["m", "A"],
+    Description -> "mass of A"
+  },
+
+  awidth == {
+    ParameterType -> External,
+    TeX -> ComposedChar["\\Gamma", "A"],
+    Description -> "width of A"
+  },
+
+  gaxx == {
+    ParameterType -> External,
+    TeX -> ComposedChar["g", "A\\chi\\chi"],
+    Description -> "A\[Chi]\[Chi] coupling"
+  }
+};

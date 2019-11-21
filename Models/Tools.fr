@@ -1,0 +1,209 @@
+(*
+  This file contains various convenience definitions for constructing Lagrangians.
+*)
+
+(* Flags specifying which models should be included *)
+$IncludeScalarMediator = False;
+$IncludeVectorMediator = False;
+$IncludePseudoScalarMediator = False;
+$IncludeAxialVectorMediator = False;
+
+(*
+  Taylor expand in fpi around fpi = Infinity to order n.
+*)
+FpiExpand[expr_, n_Integer /; n >= 0] := Normal[Series[expr, {fpi, Infinity, n}]];
+
+(*
+  Quark mass and charge matrices
+*)
+QuarkMassMatrix = DiagonalMatrix[{muq, mdq, msq}];
+QuarkChargeMatrix = DiagonalMatrix[{2 / 3, -1 / 3, -1 / 3}];
+VecCouplingMatrix = DiagonalMatrix[{gvuu, gvdd, gvss}];
+AxCouplingMatrix = DiagonalMatrix[{gauu, gadd, gass}];
+PCouplingMatrix = DiagonalMatrix[{gpuu, gpdd, gpss}];
+
+
+(*
+  Goldstone Matrices
+  ------------------
+  - Phi: Scherer Eqn.(4.28)
+  - Sigma: Above Scherer Eqn.(4.28)
+  - SqrtSigma: needed for resonance Lagrangians
+*)
+
+Phi = {
+  {pi0 + eta / Sqrt[3], Sqrt[2] * pip, Sqrt[2] * kp},
+  {Sqrt[2] * pim, -pi0 + eta / Sqrt[3], Sqrt[2] * k0},
+  {Sqrt[2] * km, Sqrt[2] * k0bar, -2 * eta / Sqrt[3]}
+};
+
+Sigma[order_Integer /; order >= 0] := Sum[
+  (1 / Factorial[n]) * (I / fpi)^n * MatrixPower[Phi, n],
+  {n, 0, order}
+];
+
+SqrtSigma[order_Integer /; order >= 0] := Sum[
+  (1 / Factorial[n]) * (I / fpi)^n * MatrixPower[Phi / 2, n],
+  {n, 0, order}
+];
+
+(*
+  Explicit expressions for Golstone matrices. Should speed up calculations.
+*)
+Sigma3 = Sigma[3];
+Sigma4 = Sigma[4];
+SigmaDag3 = HC[Sigma3];
+SigmaDag4 = HC[Sigma4];
+
+SqrtSigma2 = SqrtSigma[2];
+SqrtSigma3 = SqrtSigma[3];
+SqrtSigma4 = SqrtSigma[4];
+SqrtSigmaDag2 = HC[SqrtSigma2];
+SqrtSigmaDag3 = HC[SqrtSigma3];
+SqrtSigmaDag4 = HC[SqrtSigma4];
+
+(*
+  Currents
+  --------
+    - EMCurrentL(R): Left(Right) electromagnetic/quark current
+    - VecCurrentL(R): Left(Right) vector-mediator/quark current
+    - AxCurrentL(R): Left(Right) axial-vector-mediator/quark current
+    - WeakCurrentL: Left-Handed Weak current with W integrated out (leaving lepton current)
+    - l(r)hNoWeak: Left(Right)-handed currents with no weak interactions
+
+    - FSLeft(Right): Left(Right)-handed field strength currents
+    - FSOctetLeft(Right): Left(Right)-handed Octet field strength current
+    - FSOctetPlus(Minus): Vector(Axial-Vector) field-strength currents
+
+    - SqrtSigmaMu
+
+    - lh: Total left-handed current
+    - rh: Total right-handed current
+    - vmu: Total vector current
+    - amu: Total axial-vector current
+*)
+
+EMCurrentL[mu_] := qe * QuarkChargeMatrix * A[mu];
+EMCurrentR[mu_] := qe * QuarkChargeMatrix * A[mu];
+
+VecCurrentL[m_] := vm[m] * VecCouplingMatrix;
+VecCurrentR[m_] := vm[m] * VecCouplingMatrix;
+
+AxCurrentL[m_] := -avm[m] * AxCouplingMatrix;
+AxCurrentR[m_] := avm[m] * AxCouplingMatrix;
+
+CKM = {{0, Vud, Vus}, {0, 0, 0}, {0, 0, 0}};
+WeakCurrentL[m_] := 2 * Sqrt[2] * GF * CKM * lbar.Ga[m].ProjM.vl;
+
+lhNoWeak[m_] := Module[{current},
+  current = EMCurrentL[m];
+  If[$IncludeVectorMediator, current = current + VecCurrentL[m]];
+  If[$IncludeAxialVectorMediator, current = current + AxCurrentL[m]];
+  current
+];
+rhNoWeak[m_] := Module[{current},
+  current = EMCurrentR[m];
+  If[$IncludeVectorMediator, current = current + VecCurrentL[m]];
+  If[$IncludeAxialVectorMediator, current = current + AxCurrentR[m]];
+  current
+];
+
+FSRight[m_, n_] := FS[rhNoWeak, m, n];
+FSLeft[m_, n_] := FS[lhNoWeak, m, n];
+
+FSOctetLeft[m_, n_] := SqrtSigma4.FSLeft[m, n].SqrtSigmaDag4;
+FSOctetRight[m_, n_] := SqrtSigmaDag4.FSRight[m, n].SqrtSigma4;
+
+FSOctetPlus[m_, n_] := FSOctetLeft[m, n] + FSOctetRight[m, n];
+FSOctetMinus[m_, n_] := FSOctetLeft[m, n] - FSOctetRight[m, n];
+
+SqrtSigmaMu[m_] := I * SqrtSigmaDag2.DCS[Sigma4, m].SqrtSigmaDag2;
+
+lh[m_] := lhNoWeak[m] + WeakCurrentL[m] + HC[WeakCurrentL[m]];
+rh[m_] := rhNoWeak[m];
+
+vmu[mu_] := 1 / 2 * (rh[mu] + lh[mu]);
+amu[mu_] := 1 / 2 * (rh[mu] - lh[mu]);
+
+(*
+  Covariant derivatives
+  ---------------------
+  From Scherer's review, Eqn.(4.58):
+    D_{\mu}A = \pd_{\mu}A - I r_{\mu} A + I l_{\mu} A
+*)
+
+DCS[FF_, mu_] := del[FF, mu] - I * rh[mu].FF + I * FF.lh[mu];
+
+HCDCS[FF_, mu_] := HC[DCS[FF, mu]];
+
+(* WZW Lagrangian, ignoring terms from the weak LH current *)
+scSigmaL[m_] := SigmaDag3.del[Sigma4, m];
+scSigmaR[m_] := Sigma3.HC[del[Sigma4, m]];
+
+z1[m_, n_, r_, s_] := 1 / 2 Sigma4 . lhNoWeak[m] . SigmaDag4 . rhNoWeak[n] . Sigma4 . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s];
+z2[m_, n_, r_, s_] := Sigma4 . lhNoWeak[m] . lhNoWeak[n] . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s] - SigmaDag4 . rhNoWeak[m] . rhNoWeak[n] . rhNoWeak[r] . Sigma4 . lhNoWeak[s];
+z3[m_, n_, r_, s_] := I Sigma4 . del[lhNoWeak[n], m] . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s] - I SigmaDag4 . del[rhNoWeak[n], m] . rhNoWeak[r] . Sigma4 . lhNoWeak[s];
+z4[m_, n_, r_, s_] := I del[rhNoWeak[n], m] . Sigma4 . lhNoWeak[r] . SigmaDag4 . rhNoWeak[s] - I del[lhNoWeak[n], m] . SigmaDag4 . rhNoWeak[r] . Sigma4 . lhNoWeak[s];
+z5[m_, n_, r_, s_] := -I scSigmaL[m] . lhNoWeak[n] . SigmaDag3 . rhNoWeak[r] . Sigma3 . lhNoWeak[s] + I scSigmaR[m] . rhNoWeak[n] . Sigma3 . lhNoWeak[r] . SigmaDag3 . rhNoWeak[s];
+z6[m_, n_, r_, s_] := -I scSigmaL[m] . lhNoWeak[n] . lhNoWeak[r] . lhNoWeak[s] + I scSigmaR[m] . rhNoWeak[n] . rhNoWeak[r] . rhNoWeak[s];
+z7[m_, n_, r_, s_] := 1 / 2 scSigmaL[m] . SigmaDag3 . del[rhNoWeak[r], n] . Sigma3 . lhNoWeak[s] - 1 / 2 scSigmaR[m] . Sigma3 . del[lhNoWeak[r], n] . SigmaDag3 . rhNoWeak[s];
+z8[m_, n_, r_, s_] := 1 / 2 scSigmaL[m] . SigmaDag3 . rhNoWeak[n] . Sigma3 . del[lhNoWeak[s], r] - 1 / 2 scSigmaR[m] . Sigma3 . lhNoWeak[n] . SigmaDag3 . del[rhNoWeak[s], r];
+z9[m_, n_, r_, s_] := -scSigmaL[m] . scSigmaL[n] . SigmaDag3 . rhNoWeak[r] . Sigma3 . lhNoWeak[s] + scSigmaR[m] . scSigmaR[n] . Sigma3 . lhNoWeak[r] . SigmaDag3 . rhNoWeak[s];
+z10[m_, n_, r_, s_] := scSigmaL[m] . lhNoWeak[n] . del[lhNoWeak[s], r] - scSigmaR[m] . rhNoWeak[n] . del[rhNoWeak[s], r];
+z11[m_, n_, r_, s_] := scSigmaL[m] . del[lhNoWeak[r], n] . lhNoWeak[s] - scSigmaR[m] . del[rhNoWeak[r], n] . rhNoWeak[s];
+z12[m_, n_, r_, s_] := 1 / 2 scSigmaL[m] . lhNoWeak[n] . scSigmaL[r] . lhNoWeak[s] - 1 / 2 scSigmaR[m] . rhNoWeak[n] . scSigmaR[r] . rhNoWeak[s];
+z13[m_, n_, r_, s_] := -I scSigmaL[m] . scSigmaL[n] . scSigmaL[r] . lhNoWeak[s] + I scSigmaR[m] . scSigmaR[n] . scSigmaR[r] . rhNoWeak[s];
+
+z[m_, n_, r_, s_] := Total[{
+  z1[m, n, r, s],
+  z2[m, n, r, s],
+  z3[m, n, r, s],
+  z4[m, n, r, s],
+  z5[m, n, r, s],
+  z6[m, n, r, s],
+  z7[m, n, r, s],
+  z8[m, n, r, s],
+  z9[m, n, r, s],
+  z10[m, n, r, s],
+  z11[m, n, r, s],
+  z12[m, n, r, s],
+  z13[m, n, r, s]}];
+
+(*
+  Tools for including Resonances
+  ------------------------------
+    - ResonanceMatrix: Similar to Goldstone matrix but with vector resonances
+    - ResConnection: Connection used to define vector resonance covariant derivative
+    - ResonanceFS: Field-strength tensor for vector resonances
+    - ResonanceJ2: J2 resonance interaction term
+*)
+
+ResonanceMatrix[m_] := {
+  {rho[m] / Sqrt[2] + omega[m] / Sqrt[6], 0, 0},
+  {0, -rho[m] / Sqrt[2] + omega[m] / Sqrt[6], 0},
+  {0, 0, -2 omega[m] / Sqrt[6]}
+};
+
+ResConnection[m_] := Block[{derTerm1, derTerm2, curTerm1, curTerm2, tot},
+  derTerm1 = 1 / 2 * SqrtSigmaDag3 . del[SqrtSigma4, m];
+  curTerm1 = -I / 2 * SqrtSigmaDag4 . rhNoWeak[m] . SqrtSigma4;
+
+  derTerm2 = 1 / 2 * SqrtSigma3 . del[SqrtSigmaDag4, m];
+  curTerm2 = -I / 2 * SqrtSigma4 . lhNoWeak[m] . SqrtSigmaDag4;
+
+  tot = derTerm1 + derTerm2 + curTerm1 + curTerm2;
+
+  FpiExpand[tot, 3]
+];
+
+ResonanceFS[m_, n_] := Block[{derivTerm, connectTerm1, connectTerm2, tot},
+  derivTerm = del[ResonanceMatrix[n], m] - del[ResonanceMatrix[m], n];
+
+  (* These are already expanded to O(f^-3) *)
+  connectTerm1 = commutator[ResConnection[m], ResonanceMatrix[n]];
+  connectTerm2 = commutator[ResConnection[n], ResonanceMatrix[m]];
+
+  tot = derivTerm + connectTerm1 + connectTerm2
+];
+
+ResonanceJ2[m_, n_] := -fv / 2 / Sqrt[2] * FSOctetPlus[m, n] - I * gv / Sqrt[2] * SqrtSigmaMu[m].SqrtSigmaMu[n];

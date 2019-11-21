@@ -14,27 +14,47 @@
 BeginPackage["HazmaTools`"];
 (* Exported symbols added here with SymbolName::usage *)
 
-RamboGeneratePhaseSpace::usage = "GeneratePhaseSpace[cme, masses], GeneratePhaseSpace[cme, masses, msqrd] Generate\
-phase space points given center-of-mass energy `cme` and final state particle masses `masses`.";
+RamboGeneratePhaseSpace::usage = "Generate phase space points given center-of-mass energy `cme` and final state \
+particle masses `masses`.";
 
-RamboIntegratePhaseSpace::usage = "IntegratePhaseSpace[cme,masses], IntegratePhaseSpace[cme,masses,msqrd] Integrate\
-over phase space given center-of-mass energy `cme` and final state particle masses `masses`.";
+RamboIntegratePhaseSpace::usage = "Integrate over phase space given center-of-mass energy `cme` and final state \
+particle masses `masses`.";
 
-RamboCrossSection::usage = "RamboCrossSection[cme, ispMasses, fspMasses], RamboCrossSection[cme,ispMasses,fspMasses] \
-Compute cross-section given center-of-mass energy `cme`, inital-state-particle masses `ispMasses`, \
-final-state-particle masses `fspMasses`.";
+RamboCrossSection::usage = "Compute cross-section given center-of-mass energy `cme`, initial-state-particle masses \
+`ispMasses`, final-state-particle masses `fspMasses`.";
 
-RamboDecayWidth::usage = "RamboDecayWidth[M, fspMasses],RamboDecayWidth[M, fspMasses, msqrd] Compute decay width given \
-parent particle mass `M` and final-state-particle masses `fspMasses`.";
+RamboDecayWidth::usage = "Compute decay width given parent particle mass `M` and final-state-particle masses
+`fspMasses`.";
 
 Parallel::usage = "Option for Rambo functions to use parallelization.";
 NumPoints::usage = "Option for Rambo functions to specify number of points to generate.";
 
 Begin["`Private`"];
 
+(*
+  Core Functions
+  --------------
+  -`Metric`: 4D west-coast Minkowski metric
+  -`MassSquared`: computes scalar product of four-momenta with itself
+  -`GenerateRandomFourMomentum`: generate isotropic massless four-momenta
+  -`BoostSingleFourMomentum`: boost a four-vector by a given boost vector
+  -`BoostFourMomenta`: boost all four momenta into center of mass frame
+  -`ComputeScaleFactor`: compute factor to correct masses of four momenta
+  -`CorrectMasses`: correct four-vectors to have the correct mass
+  -`GeneratePhaseSpacePoint` generate a set of four-momenta in center of mass frame with correct masses
+*)
+
+SetAttributes[MassSquared, NumericFunction];
+SetAttributes[GenerateRandomFourMomentum, NumericFunction];
+SetAttributes[BoostSingleFourMomentum, NumericFunction];
+SetAttributes[BoostFourMomenta, NumericFunction];
+SetAttributes[ComputeScaleFactor, NumericFunction];
+SetAttributes[CorrectMasses, NumericFunction];
+SetAttributes[GeneratePhaseSpacePoint, NumericFunction];
+
 Metric = DiagonalMatrix[{1, -1, -1, -1}];
 
-MassSquared[fm_] := Dot[fm, Metric, fm];
+MassSquared[fm_?VectorQ /; Length[fm] == 4] := Dot[fm, Metric, fm];
 
 GenerateRandomFourMomentum[] := Module[{e, c, phi},
   c = 2.0 * RandomReal[] - 1.0;
@@ -43,7 +63,7 @@ GenerateRandomFourMomentum[] := Module[{e, c, phi},
   {e, e * Sqrt[1 - c^2] * Cos[phi], e * Sqrt[1 - c^2] * Sin[phi], e * c}
 ];
 
-BoostSingleFourMomentum[fm_, x_, b_, gamma_, a_] := Module[{dotProd},
+BoostSingleFourMomentum[fm_?VectorQ, x_?NumericQ, b_?VectorQ, gamma_?NumericQ, a_?NumericQ] := Module[{dotProd},
   dotProd = b[[1]] * fm[[2]] + b[[2]] * fm[[3]] + b[[3]] * fm[[4]];
   {
     x * (gamma * fm[[1]] + dotProd),
@@ -53,8 +73,8 @@ BoostSingleFourMomentum[fm_, x_, b_, gamma_, a_] := Module[{dotProd},
   }
 ];
 
-BoostFourMomenta[fourMomenta_, cme_] := Module[{sumQs, massQ, b, x, gamma, a, n},
-  sumQs = Total[fourMomenta];
+BoostFourMomenta[fms_?MatrixQ, cme_?NumericQ] := Module[{sumQs, massQ, b, x, gamma, a, n},
+  sumQs = Total[fms];
   massQ = Re[Sqrt[MassSquared[sumQs]]];
 
   b = {-sumQs[[2]] / massQ, -sumQs[[3]] / massQ, -sumQs[[4]] / massQ};
@@ -62,16 +82,16 @@ BoostFourMomenta[fourMomenta_, cme_] := Module[{sumQs, massQ, b, x, gamma, a, n}
   x = cme / massQ;
   gamma = sumQs[[1]] / massQ;
   a = 1 / (1 + gamma);
-  n = Length[fourMomenta];
+  n = Length[fms];
 
   (* return list of boosted four-momenta and weight *)
   {
-    Table[BoostSingleFourMomentum[fm, x, b, gamma, a], {fm, fourMomenta}],
+    Table[BoostSingleFourMomentum[fm, x, b, gamma, a], {fm, fms}],
     (Pi / 2)^(n - 1) * cme^(2 * n - 4) / Factorial[n - 2] / Factorial[n - 1] * (2 * Pi)^(4 - 3 * n)
   }
 ];
 
-ComputeScaleFactor[fms_, cme_, masses_] := Module[{xi, dxi, isDone, tol, maxIter, f, df, delf, iter},
+ComputeScaleFactor[fms_?MatrixQ, cme_?NumericQ, masses_?VectorQ] := Module[{xi, dxi, isDone, tol, maxIter, f, df, delf, iter},
   xi = Sqrt[1 - Total[masses]^2 / cme^2];
 
   tol = 10^-4;
@@ -94,7 +114,7 @@ ComputeScaleFactor[fms_, cme_, masses_] := Module[{xi, dxi, isDone, tol, maxIter
   xi
 ];
 
-CorrectMasses[fms_, weight_, cme_, masses_] := Module[{t1, t2, t3, xi, newFM, n},
+CorrectMasses[fms_?MatrixQ, weight_?NumericQ, cme_?NumericQ, masses_?VectorQ] := Module[{t1, t2, t3, xi, newFM, n},
 
   xi = ComputeScaleFactor[fms, cme, masses];
   newFM = Table[
@@ -122,45 +142,54 @@ CorrectMasses[fms_, weight_, cme_, masses_] := Module[{t1, t2, t3, xi, newFM, n}
 
 ];
 
-GeneratePhaseSpacePoint[cme_, masses_] := Module[{fms, weight},
+GeneratePhaseSpacePoint[cme_?NumericQ, masses_?VectorQ] := Module[{fms, weight},
   fms = Table[GenerateRandomFourMomentum[], {Length[masses]}];
   {fms, weight} = BoostFourMomenta[fms, cme];
   {fms, weight} = CorrectMasses[fms, weight, cme, masses];
   {fms, weight}
 ];
 
-GeneratePhaseSpacePoint[cme_, masses_, msqrd_] := Module[{fms, weight},
+GeneratePhaseSpacePoint[cme_?NumericQ, masses_?VectorQ, msqrd_] := Module[{fms, weight},
   fms = Table[GenerateRandomFourMomentum[], {Length[masses]}];
   {fms, weight} = BoostFourMomenta[fms, cme];
   {fms, weight} = CorrectMasses[fms, weight, cme, masses];
   {fms, weight * msqrd[fms]}
 ];
 
+(*
+  API Functions
+  -------------
+  -`RamboGeneratePhaseSpace`: Generate many phase space points
+  -`RamboIntegratePhaseSpace`: Integrate over a phase space
+  -`RamboCrossSection`: Compute a cross section for 2 -> N
+  -`RamboDecayWidth`: Compute a width for 1 -> N
+*)
+
+SetAttributes[RamboGeneratePhaseSpace, NumericFunction];
+SetAttributes[RamboIntegratePhaseSpace, NumericFunction];
+SetAttributes[RamboCrossSection, NumericFunction];
+SetAttributes[RamboDecayWidth, NumericFunction];
+
 Options[RamboGeneratePhaseSpace] := {
   NumPoints -> 10000,
   Parallel -> True
 };
 
-RamboGeneratePhaseSpace[cme_, masses_, OptionsPattern[]] := Module[{},
+RamboGeneratePhaseSpace[cme_?NumericQ, masses_?VectorQ, OptionsPattern[]] := Module[{},
   If[OptionValue[Parallel],
     ParallelTable[GeneratePhaseSpacePoint[cme, masses], OptionValue[NumPoints]],
     Table[GeneratePhaseSpacePoint[cme, masses], OptionValue[NumPoints]]
   ]
 ];
 
-RamboGeneratePhaseSpace[cme_, masses_, msqrd_, OptionsPattern[]] := Module[{},
+RamboGeneratePhaseSpace[cme_?NumericQ, masses_?VectorQ, msqrd_, OptionsPattern[]] := Module[{},
   If[OptionValue[Parallel],
     ParallelTable[GeneratePhaseSpacePoint[cme, masses, msqrd], OptionValue[NumPoints]],
     Table[GeneratePhaseSpacePoint[cme, masses, msqrd], OptionValue[NumPoints]]
   ]
 ];
 
-Options[RamboIntegratePhaseSpace] := {
-  NumPoints -> 10000,
-  Parallel -> True
-};
-
-RamboIntegratePhaseSpace[cme_, masses_, OptionsPattern[]] := Module[{points, weights},
+RamboIntegratePhaseSpace[cme_?NumericQ, masses_?VectorQ, OptionsPattern[RamboGeneratePhaseSpace]] := Module[{points, weights},
   points = RamboGeneratePhaseSpace[cme, masses,
     Parallel -> OptionValue[Parallel],
     NumPoints -> OptionValue[NumPoints]];
@@ -171,10 +200,11 @@ RamboIntegratePhaseSpace[cme_, masses_, OptionsPattern[]] := Module[{points, wei
   {Mean[weights], Sqrt[Variance[weights] / OptionValue[NumPoints]]}
 ];
 
-RamboIntegratePhaseSpace[cme_, masses_, msqrd_, OptionsPattern[]] := Module[{points, weights},
+RamboIntegratePhaseSpace[cme_?NumericQ, masses_?VectorQ, msqrd_, OptionsPattern[RamboGeneratePhaseSpace]] := Module[{points, weights},
   points = RamboGeneratePhaseSpace[cme, masses, msqrd,
     Parallel -> OptionValue[Parallel],
-    NumPoints -> OptionValue[NumPoints]];
+    NumPoints -> OptionValue[NumPoints]
+  ];
   weights = If[OptionValue[Parallel],
     ParallelTable[point[[2]], {point, points}],
     Table[point[[2]], {point, points}]
@@ -182,12 +212,7 @@ RamboIntegratePhaseSpace[cme_, masses_, msqrd_, OptionsPattern[]] := Module[{poi
   {Mean[weights], Sqrt[Variance[weights] / OptionValue[NumPoints]]}
 ];
 
-Options[RamboCrossSection] := {
-  NumPoints -> 10000,
-  Parallel -> True
-};
-
-RamboCrossSection[cme_, ispMasses_, fspMasses_, OptionsPattern[]] := Module[{integral, err, m1, m2, p, pf},
+RamboCrossSection[cme_?NumericQ, ispMasses_?VectorQ, fspMasses_?VectorQ, OptionsPattern[RamboGeneratePhaseSpace]] := Module[{integral, err, m1, m2, p, pf},
   {integral, err} = RamboIntegratePhaseSpace[cme, fspMasses,
     Parallel -> OptionValue[Parallel],
     NumPoints -> OptionValue[NumPoints]
@@ -202,7 +227,7 @@ RamboCrossSection[cme_, ispMasses_, fspMasses_, OptionsPattern[]] := Module[{int
   {integral * pf, err * pf}
 ];
 
-RamboCrossSection[cme_, ispMasses_, fspMasses_, msqrd_, OptionsPattern[]] := Module[{integral, err, m1, m2, p, pf},
+RamboCrossSection[cme_?NumericQ, ispMasses_?VectorQ, fspMasses_?VectorQ, msqrd_, OptionsPattern[RamboGeneratePhaseSpace]] := Module[{integral, err, m1, m2, p, pf},
   {integral, err} = RamboIntegratePhaseSpace[cme, fspMasses, msqrd,
     Parallel -> OptionValue[Parallel],
     NumPoints -> OptionValue[NumPoints]
@@ -217,12 +242,7 @@ RamboCrossSection[cme_, ispMasses_, fspMasses_, msqrd_, OptionsPattern[]] := Mod
   {integral * pf, err * pf}
 ];
 
-Options[RamboDecayWidth] := {
-  NumPoints -> 10000,
-  Parallel -> True
-};
-
-RamboDecayWidth[M_, fspMasses_, OptionsPattern[]] := Module[{integral, err},
+RamboDecayWidth[M_?NumericQ, fspMasses_?VectorQ, OptionsPattern[RamboGeneratePhaseSpace]] := Module[{integral, err},
   {integral, err} = RamboIntegratePhaseSpace[M, fspMasses,
     Parallel -> OptionValue[Parallel],
     NumPoints -> OptionValue[NumPoints]
@@ -230,7 +250,7 @@ RamboDecayWidth[M_, fspMasses_, OptionsPattern[]] := Module[{integral, err},
   {integral / (2 * M), err / (2 * M)}
 ];
 
-RamboDecayWidth[M_, fspMasses_, msqrd_, OptionsPattern[]] := Module[{integral, err},
+RamboDecayWidth[M_?NumericQ, fspMasses_?VectorQ, msqrd_, OptionsPattern[RamboGeneratePhaseSpace]] := Module[{integral, err},
   {integral, err} = RamboIntegratePhaseSpace[M, fspMasses, msqrd,
     Parallel -> OptionValue[Parallel],
     NumPoints -> OptionValue[NumPoints]

@@ -1,0 +1,189 @@
+(* Total Lagrangian *)
+
+Lagrangian := Module[{lag},
+  lag = LPhoton + LNeutrino + LLepton;
+  lag += LDarkMatter;
+  lag += LChiPT;
+  If[$IncludeScalarMediator, lag += LScalar];
+  If[$IncludeVectorMediator, lag += LVector];
+  If[$IncludeAxialVectorMediator, lag += LAxialVector];
+  lag
+];
+
+(*
+  Plain Standard Model
+  --------------------
+    - LPhoton: Photon kinetic term
+    - LNeutrino: Neutrino kinetic term
+    - LLepton: Lepton kinetic term
+*)
+
+LPhoton := Block[{mu, nu},
+  -1 / 4 * FS[A, mu, nu] FS[A, mu, nu]
+];
+
+LNeutrino := Block[{m},
+  I * left[nubar].Ga[m].del[left[nu], m]
+];
+
+LLepton := Block[{m},
+  I * lbar.Ga[m].DC[l, m] - ml lbar.l
+];
+
+(*
+  Dark Matter
+  -----------
+    - LDarkMatter: DM kinetic and mass terms
+*)
+
+LDarkMatter := Block[{mu}, I * (xbar . Ga[mu] . del[x, mu]) - mx * xbar . x];
+
+(*
+  Chiral Lagrangian
+  -----------------
+    - LChiPTKinetic: Meson kinetic term Scherer Eqn.(4.70)
+    - LChiPTMass: Meson mass term Scherer Eqn.(4.70) with chi = 2 * B0 * QuarkMassMatrix
+    - LChiPTWessZuminoWitten: Wess-Zumino-Witten term
+    - LChiPTKineticRho: Kinetic term for the rho vector meson
+    - LChiPTRhoMes: Interaction term between rho vector meson and pions
+    - LChiPTContactRho: pi-pi-gamma contact interactions required to correct the rho propagator
+    - LChiPT: Chiral Lagrangian
+*)
+
+LChiPTKinetic := Block[{mu, kinetic},
+  kinetic = fpi^2 / 4 * Tr[DCS[Sigma4, mu].HCDCS[Sigma4, mu]];
+  FpiExpand[kinetic, 4]
+];
+
+LChiPTMass := b0 * fpi^2 / 2 * Tr[QuarkMassMatrix.(Sigma4 + SigmaDag4)];
+
+LChiPTWessZuminoWitten := Block[{m, n, r, s, coeff},
+  (*
+    This is positive since I'm using P&S and Schwartz' sign convention for Eps! Shouldn't affect
+    anything since none of the amplitudes coming from L_WZW interfere with amplitudes coming from
+    the rest of the Lagrangian.
+   *)
+  coeff = I / (48 Pi^2);
+
+  3 coeff Eps[m, n, r, s] Tr[FpiExpand[z[m, n, r, s], 3]]
+];
+
+LChiPTKineticRho := Block[{m, n, kinetic, mass},
+  kinetic = -1 / 4 * Tr[ResonanceFS[m, n] . ResonanceFS[m, n]];
+  mass = mVectorRes^2 / 2 * Tr[ResonanceMatrix[m] . ResonanceMatrix[m]];
+
+  kinetic + mass;
+
+  FpiExpand[kinetic + mass, 3]
+];
+
+LChiPTRhoMes := Block[{m, n},
+  1 / mVectorRes Tr[ResonanceFS[m, n] . ResonanceJ2[m, n]] // FpiExpand[#, 2]&
+];
+
+LChiPTContactRho := Block[{m, n},
+  -rhoContactCoeff / mVectorRes^2 Tr[ResonanceJ2[m, n] . ResonanceJ2[m, n]] // FpiExpand[#, 4]&
+];
+
+(* NOTE: Not including rho *)
+LChiPT := Normal[Series[LChiPTKinetic + LChiPTMass + LChiPTWessZuminoWitten, {GF, 0, 1}]];
+
+
+(*
+  Scalar Mediator Theory
+  ----------------------
+    - fpiT: unphysical value of fpi
+    - b0T: unphysical value of b0
+    - LScalarKineticS: Scalar-Mediator kinetic term
+    - LScalarSLL: ScalarMediator-Lepton interactions
+    - LScalarSXX: ScalarMediator-DarkMatter interactions
+    - LScalarSFF: Effective interaction between ScalarMediator and photons
+    - LScalarMesSKin: Interactions between ScalarMediator and mesons through meson kinetic term
+    - LScalarMesSMass: Interactions between ScalarMediator and mesons through meson mass term
+    - LScalar: Full scalar piece of Lagrangian
+*)
+
+fpiT = (3 * fpi) / Sqrt[9 + (4 * gsGG * vs) / Lam];
+
+b0T = (b0 * (9 * Lam + 4 * gsGG * vs) * (-2 * gsGG * vh * vs + 3 * Lam * (vh - gsff * vs))) / (27 * Lam^2 * vh);
+
+LScalarKineticS := Block[{mu},
+  1 / 2 * del[s, mu] * del[s, mu] - 1 / 2 * ms^2 * s * s
+];
+
+LScalarSLL := -gsll * s * lbar.l;
+
+LScalarSXX := -gsxx * s * xbar.x;
+
+LScalarSFF := Block[{m, n},
+  (alphaEM * gsFF) / (4 * Lam * Pi) * s * FS[A, m, n] * FS[A, m, n]
+];
+
+LScalarMesSKin := Module[{mu, coeff, kinetic, interaction},
+  coeff = (fpiT^2 * gsGG) / (9 * Lam);
+
+  kinetic = Tr[DCS[Sigma4, mu] . HCDCS[Sigma4, mu]];
+
+  interaction = coeff * s * kinetic;
+
+  FpiExpand[interaction, 4]
+];
+
+LScalarMesSMass := Module[{coeff1, coeff2, interaction},
+  coeff1 = (b0T * fpiT^2 * (2 * gsGG * vh * (9 * Lam - 4 * gsGG * vs) + 9 * gsff * Lam * (3 * Lam + 4 * gsGG * vs))) / (54 * Lam^2 * vh);
+
+  coeff2 = (b0T * fpiT^2 * gsGG * (9 * gsff * Lam -
+      2 * gsGG * vh)) / (27 * Lam^2 * vh);
+
+  interaction = (s * coeff1 + s^2 * coeff2) * Tr[QuarkMassMatrix . (Sigma4 + SigmaDag4)];
+
+  FpiExpand[interaction, 4]
+];
+
+LScalar := LScalarKineticS + LScalarSLL + LScalarSXX + LScalarSFF + LScalarMesSKin + LScalarMesSMass;
+
+
+(*
+  Vector Mediator Theory
+  ----------------------
+    - LVectorKineticV: Vector-Mediator Kinetic Term
+    - LVectorVLL: Lepton-AntiLepton-VectorMediator interaction
+    - LVectorVXX: DarkMatter-AntiDarkMatter-VectorMediator interaction
+    - LVector: Vector part of Lagrangian
+*)
+
+LVectorKineticV := Block[{m, n, kinetic, mass},
+  kinetic = -1 / 4 * FS[vm, m, n] * FS[vm, m, n];
+  mass = mv^2 / 2 * vm[m] * vm[m];
+
+  kinetic + mass
+];
+
+LVectorVLL := Block[{m}, gvll * vm[m] * lbar.Ga[m].l];
+
+LVectorVXX := Block[{m}, gvxx * vm[m] * xbar.Ga[m].x];
+
+LVector := LVectorKineticV + LVectorVLL + LVectorVXX;
+
+
+(*
+  Axial-Vector Mediator Theory
+  ----------------------
+    - LAxialVectorKineticA: AxialVectorMediator Kinetic Term
+    - LAxialVectorALL: Lepton-AntiLepton-AxialVectorMediator interaction
+    - LAxialVectorAXX: DarkMatter-AntiDarkMatter-AxialVectorMediator interaction
+    - LAxialVector: Axial-vector part of Lagrangian
+*)
+
+LAxialVectorKineticA := Block[{m, n, kinetic, mass},
+  kinetic = -1 / 4 * FS[avm, m, n] * FS[avm, m, n];
+  mass = ma^2 / 2 * avm[m] * avm[m];
+
+  kinetic + mass
+];
+
+LAxialVectorALL := Block[{m}, gall * avm[m] * lbar.Ga[m].(ProjP - ProjM).l];
+
+LAxialVectorAXX := Block[{m}, gaxx * avm[m] * xbar.Ga[m].(ProjP - ProjM).x];
+
+LAxialVector := LAxialVectorKineticA + LAxialVectorALL + LAxialVectorAXX;

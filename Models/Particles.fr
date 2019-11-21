@@ -1,0 +1,226 @@
+(*
+  This file contains all definitions of particles in Hazma. The available particles are:
+
+  ======================================================
+  | Particle               | name                      |
+  |====================================================|
+  | Neutral pion           | pi0                       |
+  | Charged pion           | pim, pip (pipbar, pimbar) |
+  | Neutral kaon           | k0, k0bar                 |
+  | Charged kaon           | km, kp (kpbar, kmbar)     |
+  | Eta                    | eta                       |
+  | Photon                 | A                         |
+  | Rho                    | rho                       |
+  | Omega                  | omega                     |
+  | Lepton                 | l                         |
+  | Neutrino               | vl                        |
+  | Dark Matter            | x                         |
+  |----------------------------------------------------|
+  | Scalar Mediator        | sm                        |
+  | Vector Mediator        | vm                        |
+  | Pseudo-Scalar Mediator | psm                       |
+  | Axial-Vector Mediator  | avm                       |
+  ======================================================
+
+*)
+
+FeynmanGauge = True;
+
+M$GaugeGroups = {
+  U1EM == {
+    Abelian -> True,
+    CouplingConstant -> qe,
+    GaugeBoson -> A,
+    Charge -> Q
+  }
+};
+
+M$ClassesDescription = {
+  (* Goldstones *)
+  S[1] == {
+    ClassName -> pi0,
+    SelfConjugate -> True,
+    Mass -> {mpi0, 0.13498},
+    Width -> 0,
+    ParticleName -> "pi0",
+    TeXParticleName -> ComposedChar["\\pi", Null, "0"],
+    PropagatorLabel -> ComposedChar["\\pi", Null, "0"]
+  },
+
+  S[2] == {
+    ClassName -> pim,
+    SelfConjugate -> False,
+    Mass -> {mpi, 0.13957},
+    QuantumNumbers -> {Q -> -1},
+    Width -> 0,
+    ParticleName -> "pim",
+    AntiParticleName -> "pip",
+    TeXParticleName -> ComposedChar["\\pi", Null, "-"],
+    TeXAntiParticleName -> ComposedChar["\\pi", Null, "+"],
+    PropagatorLabel -> ComposedChar["\\pi", Null, "-"],
+    PropagatorArrow -> Forward
+  },
+
+  S[3] == {
+    ClassName -> k0,
+    SelfConjugate -> False,
+    Mass -> {mk0, 0.49765},
+    Width -> 0,
+    ParticleName -> "k0",
+    AntiParticleName -> "k0~",
+    TeXParticleName -> ComposedChar["K", Null, "0"],
+    TeXAntiParticleName -> ComposedChar["K", Null, "0", "\\bar"],
+    PropagatorLabel -> ComposedChar["K", Null, "0"],
+    PropagatorArrow -> Forward
+  },
+
+  S[4] == {
+    ClassName -> km,
+    SelfConjugate -> False,
+    Mass -> {mk, 0.49367},
+    QuantumNumbers -> {Q -> -1},
+    Width -> 0,
+    ParticleName -> "km",
+    AntiParticleName -> "kp",
+    TeXParticleName -> ComposedChar["K", Null, "-"],
+    TeXAntiParticleName -> ComposedChar["K", Null, "+"],
+    PropagatorLabel -> ComposedChar["K", Null, "-"],
+    PropagatorArrow -> Forward
+  },
+
+  S[5] == {
+    ClassName -> eta,
+    SelfConjugate -> True,
+    Mass -> {meta, 0.547862},
+    Width -> 0,
+    ParticleName -> "eta",
+    TeXParticleName -> "\\eta",
+    PropagatorLabel -> "\\eta"
+  },
+
+  (* Scalar Mediator *)
+  S[7] == {
+    ClassName -> sm,
+    SelfConjugate -> True,
+    Width -> swidth,
+    Mass -> ms,
+    ParticleName -> "S",
+    TeXParticleName -> "S",
+    PropagatorLabel -> "S"
+  },
+
+  (* Pseudo-Scalar Mediator *)
+  S[8] == {
+    ClassName -> psm,
+    SelfConjugate -> True,
+    Width -> pwidth,
+    Mass -> mp,
+    ParticleName -> "P",
+    TeXParticleName -> "P",
+    PropagatorLabel -> "P"
+  },
+
+  (* Photon *)
+  V[1] == {
+    ClassName -> A,
+    SelfConjugate -> True,
+    Mass -> 0,
+    Width -> 0,
+    ParticleName -> "A",
+    TeXParticleName -> "\\gamma",
+    PropagatorLabel -> "\\gamma"
+  },
+
+  V[2] == {
+    ClassName -> rho,
+    SelfConjugate -> True,
+    Mass -> mrho,
+    Width -> rhowidth,
+    ParticleName -> "rho",
+    PropagatorLabel -> "\\rho",
+    TeXParticleName -> "\\rho"
+  },
+
+  V[3] == {
+    ClassName -> omega,
+    SelfConjugate -> True,
+    Mass -> momega,
+    Width -> omegawidth,
+    ParticleName -> "omega",
+    TeXParticleName -> "\\omega",
+    PropagatorLabel -> "\\omega"
+  },
+
+  (* Vector Mediator *)
+  V[4] == {
+    ClassName -> vm,
+    SelfConjugate -> True,
+    Mass -> mv,
+    Width -> vwidth,
+    ParticleName -> "V",
+    TeXParticleName -> "V",
+    PropagatorLabel -> "V"
+  },
+
+  (* Axial-Vector Mediator*)
+  V[5] == {
+    ClassName -> avm,
+    SelfConjugate -> True,
+    Mass -> ma,
+    Width -> awidth,
+    ParticleName -> "A",
+    TeXParticleName -> "A",
+    PropagatorLabel -> "A"
+  },
+
+  (* SM leptons *)
+  F[1] == {
+    ClassName -> vl,
+    SelfConjugate -> False,
+    Mass -> 0,
+    Width -> 0,
+    QuantumNumbers -> {LeptonNumber -> 1},
+    ParticleName -> "vl",
+    ParticleName -> "vl~",
+    TeXParticleName -> ComposedChar["\\nu", "\\ell", Null],
+    PropagatorLabel -> ComposedChar["\\nu", "\\ell", Null],
+    PropagatorType -> S,
+    PropagatorArrow -> Forward
+  },
+
+  F[2] == {
+    ClassName -> l,
+    SelfConjugate -> False,
+    Mass -> ml,
+    QuantumNumbers -> {Q -> -1, LeptonNumber -> 1},
+    ParticleName -> "l",
+    ParticleName -> "l~",
+    TeXParticleName -> "\\ell",
+    PropagatorLabel -> "\\ell",
+    PropagatorType -> Straight,
+    PropagatorArrow -> Forward
+  },
+
+  (* Dark matter *)
+  F[3] == {
+    ClassName -> x,
+    SelfConjugate -> False,
+    Mass -> mx,
+    Width -> 0,
+    ParticleName -> "x",
+    AntiParticleName -> "x~",
+    TeXParticleName -> "\\chi",
+    TeXAntiParticleName -> ComposedChar["\\chi", Null, Null, "\\bar"],
+    PropagatorLabel -> "\\chi",
+    PropagatorArrow -> Forward
+  }
+};
+
+(* Need both of these terms to use the pip and kp field names *)
+(* Note that FeynRules automatically creates the k0bar conjugate field *)
+pip = anti[pim];
+pipbar = pim;
+kp = anti[km];
+kpbar = km;
+
+GaugeXi[V[1]] = GaugeXi[A];

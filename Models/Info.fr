@@ -1,0 +1,23 @@
+M$ModelName = "Hazma";
+
+M$Information = {
+  Authors -> {"Adam Coogan", "Logan Morrison"},
+  Date -> "11/20/2019",
+  Institutions -> {
+    "University of Amsterdam, GRAPPA",
+    "University of California, Santa Cruz",
+    "Santa Cruz Institute for Particle Physics"
+  },
+  Emails -> {
+    "a.m.coogan@uva.nl",
+    "loanmorr@ucsc.edu"
+  },
+  URLs -> {
+    "https://github.com/LoganAMorrison/HazmaTools",
+    "https://github.com/LoganAMorrison/Hazma"
+  },
+  References -> {
+    "https://arxiv.org/pdf/1907.11846.pdf"
+  },
+  Version -> 1
+};
