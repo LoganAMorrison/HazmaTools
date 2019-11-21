@@ -107,24 +107,22 @@ fpiT = (3 * fpi) / Sqrt[9 + (4 * gsGG * vs) / Lam];
 
 b0T = (b0 * (9 * Lam + 4 * gsGG * vs) * (-2 * gsGG * vh * vs + 3 * Lam * (vh - gsff * vs))) / (27 * Lam^2 * vh);
 
-LScalarKineticS := Block[{mu},
-  1 / 2 * del[s, mu] * del[s, mu] - 1 / 2 * ms^2 * s * s
-];
+LScalarKineticS := Block[{mu}, 1 / 2 * (del[sm, mu] * del[sm, mu] - ms^2 * sm^2)];
 
-LScalarSLL := -gsll * s * lbar.l;
+LScalarSLL := -gsll * sm * lbar.l;
 
-LScalarSXX := -gsxx * s * xbar.x;
+LScalarSXX := -gsxx * sm * xbar.x;
 
 LScalarSFF := Block[{m, n},
-  (alphaEM * gsFF) / (4 * Lam * Pi) * s * FS[A, m, n] * FS[A, m, n]
+  (alphaEM * gsFF) / (4 * Lam * Pi) * sm * FS[A, m, n] * FS[A, m, n]
 ];
 
 LScalarMesSKin := Module[{mu, coeff, kinetic, interaction},
   coeff = (fpiT^2 * gsGG) / (9 * Lam);
 
-  kinetic = Tr[DCS[Sigma4, mu] . HCDCS[Sigma4, mu]];
+  kinetic = Tr[DCS[Sigma4, mu].HCDCS[Sigma4, mu]];
 
-  interaction = coeff * s * kinetic;
+  interaction = coeff * sm * kinetic;
 
   FpiExpand[interaction, 4]
 ];
@@ -135,7 +133,7 @@ LScalarMesSMass := Module[{coeff1, coeff2, interaction},
   coeff2 = (b0T * fpiT^2 * gsGG * (9 * gsff * Lam -
       2 * gsGG * vh)) / (27 * Lam^2 * vh);
 
-  interaction = (s * coeff1 + s^2 * coeff2) * Tr[QuarkMassMatrix . (Sigma4 + SigmaDag4)];
+  interaction = (sm * coeff1 + sm^2 * coeff2) * Tr[QuarkMassMatrix.(Sigma4 + SigmaDag4)];
 
   FpiExpand[interaction, 4]
 ];
