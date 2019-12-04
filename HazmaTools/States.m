@@ -197,7 +197,7 @@ Omega = FeynArts`V[1];
 
 (* Leptons *)
 Neutrino = FeynArts`F[1];
-AntiNeutrino = -FeynArts`V[1];
+AntiNeutrino = -FeynArts`F[1];
 Lepton = FeynArts`F[2];
 AntiLepton = -FeynArts`F[2];
 

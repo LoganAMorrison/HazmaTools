@@ -130,8 +130,7 @@ LScalarMesSKin := Module[{mu, coeff, kinetic, interaction},
 LScalarMesSMass := Module[{coeff1, coeff2, interaction},
   coeff1 = (b0T * fpiT^2 * (2 * gsGG * vh * (9 * Lam - 4 * gsGG * vs) + 9 * gsff * Lam * (3 * Lam + 4 * gsGG * vs))) / (54 * Lam^2 * vh);
 
-  coeff2 = (b0T * fpiT^2 * gsGG * (9 * gsff * Lam -
-      2 * gsGG * vh)) / (27 * Lam^2 * vh);
+  coeff2 = (b0T * fpiT^2 * gsGG * (9 * gsff * Lam - 2 * gsGG * vh)) / (27 * Lam^2 * vh);
 
   interaction = (sm * coeff1 + sm^2 * coeff2) * Tr[QuarkMassMatrix.(Sigma4 + SigmaDag4)];
 

@@ -1,0 +1,89 @@
+M$ModelName = "HazmaSpectraTutorialModel";
+M$Information = {
+  Authors -> {"Adam Coogan", "Logan Morrison"},
+  Date -> "8/15/2018",
+  Institutions -> {"UC Santa Cruz"},
+  Emails -> {"acoogan@ucsc.edu", "loanmorr@ucsc.edu"},
+  Version -> 1
+};
+
+FeynmanGauge = True;
+M$GaugeGroups = {
+  U1EM == {
+    Abelian -> True,
+    CouplingConstant -> e,
+    GaugeBoson -> A,
+    Charge -> Q
+  }
+};
+
+M$Parameters = {e == {ParameterType -> External, TeX -> "e",
+  Description -> "Gauge coupling"},
+  gsff == {ParameterType -> External,
+    TeX -> ComposedChar["g", "sff"],
+    Description -> "Coupling scalar med. to fermions"},
+  gspp1 == {ParameterType -> External,
+    TeX -> ComposedChar["g", "spp1"],
+    Description -> "First coupling scalar med. to charged scalars"},
+  gspp2 == {ParameterType -> External,
+    TeX -> ComposedChar["g", "spp2"],
+    Description -> "Second coupling scalar med. to charged scalars"},
+  gvff == {ParameterType -> External,
+    TeX -> ComposedChar["g", "vff"],
+    Description -> "Coupling vector med. to fermions"},
+  gvpp == {ParameterType -> External,
+    TeX -> ComposedChar["g", "vpp"],
+    Description -> "Coupling vector med. to charged scalars"}
+};
+
+M$ClassesDescription = {(*Goldstones*)
+  S[1] == {ClassName -> s, SelfConjugate -> True, Mass -> ms,
+    Width -> widths, ParticleName -> "S", TeXParticleName -> "S",
+    PropagatorLabel -> "S"},
+  S[2] == {ClassName -> phi, SelfConjugate -> False, Mass -> mphi,
+    QuantumNumbers -> {Q -> 1}, Width -> 0, ParticleName -> "phi",
+    AntiParticleName -> "phi~", TeXParticleName -> "\\phi",
+    TeXAntiParticleName -> ComposedChar["\\phi", Null, "\\dagger"],
+    PropagatorLabel -> "phi", PropagatorArrow -> Forward}, (*Photon*)
+  V[1] == {ClassName -> A, SelfConjugate -> True, Mass -> 0,
+    Width -> 0, ParticleName -> "A", TeXParticleName -> "\\gamma"},
+  V[2] == {ClassName -> v, SelfConjugate -> True, Mass -> mv,
+    Width -> widthv, ParticleName -> "\\V",
+    PropagatorLabel -> "\\V"},
+  F[1] == {ClassName -> f, SelfConjugate -> False, Mass -> mf,
+    QuantumNumbers -> {Q -> 1}, PropagatorLabel -> {"f"},
+    PropagatorType -> Straight, PropagatorArrow -> Forward}
+};
+GaugeXi[V[1]] = GaugeXi[A];
+
+LKinetic := Block[{mu, nu},
+  Total[{
+    (*scalar mediator*)
+    1 / 2 * del[s, mu] * del[s, mu] - 1 / 2 * ms^2 * s * s,
+    (*charged scalar*)
+
+    HC[DC[phi, mu]].DC[phi, mu] -
+        mphi^2 * phibar.phi, (*charged fermion*)
+
+    I * fbar.Ga[mu].DC[f, mu] -
+        mf * fbar.f, (*vector mediator*)
+    -1 / 4 * FS[v, mu, nu] *
+        FS[v, mu, nu] + 1 / 2 * mv^2 * v[mu] * v[mu],
+    (*photon*)
+    -1 / 4 * FS[A, mu, nu] * FS[A, mu, nu]
+  }]
+];
+
+LInteraction := Block[{mu}, Total[{
+  (*S-f-f*)
+  -gsff * s * fbar.f,
+  (*S-phi-phi*)
+  -s * (gspp1 * phibar.phi + gspp2 * DC[phibar, mu].DC[phi, mu]),
+  (*V-f-f*)
+  gvff * v[mu] * fbar.Ga[mu].f,
+  (*V-phi-phi*)
+  I * gvpp * v[mu] * (phibar.DC[phi, mu] - DC[phibar, mu].phi)
+}]
+];
+
+Lagrangian := LKinetic + LInteraction;

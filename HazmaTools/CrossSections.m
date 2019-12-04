@@ -13,11 +13,66 @@
 
 BeginPackage["HazmaTools`"];
 
-HazmaComputeCrossSection22::usage = "HazmaComputeCrossSection22[]"
-HazmaComputeCrossSection22TimesVelocity::usage = "HazmaComputeCrossSection22TimesVelocity[]"
+HazmaComputeCrossSection22::usage = "HazmaComputeCrossSection22[]";
+HazmaComputeCrossSection::usage = "HazmaComputeCrossSection[]";
+HazmaComputeCrossSection22TimesVelocity::usage = "HazmaComputeCrossSection22TimesVelocity[]";
 
 Begin["`Private`"];
 
+IntegralTable[t_, tmin_, tmax_] := {(*** Integral Table ***)
+  (** Integrals of t^n / X **)
+  (* t^n / (t+a)(t+b) and n >= 1 *)
+  c_. t^n_ / ((x_.t + a_) * (y_.t + b_)) :> c / (x * y) * ((
+    ((-1)^n * (a / x)^n) / (b / y - a / x)) * Log[(tmax + a / x) / (tmin + a / x)] -
+      (((-1)^n * (b / y)^n) / (b / y - a / x)) *
+          Log[(tmax + b / y) / (tmin + b / y)] + Sum[Binomial[n, k] * (-1)^k *
+      (((a / x)^k * (tmax + a / x)^(n - k) - (b / y)^k * (tmax + b / y)^(n - k)) / ((b / y - a / x) * (n - k)) -
+          ((a / x)^k * (tmin + a / x)^(n - k) - (b / y)^k * (tmin + b / y)^(n - k)) / ((b / y - a / x) * (n - k))),
+    {k, 0, n - 1}]) /; n > 0 && a / x =!= b / y && FreeQ[c, t] && UnsameQ[x, 0] && UnsameQ[y, 0],
+  (* t^n / (t+a)^2 and n >= 2 *)
+  c_. t^n_ / (x_.t + a_)^2 :> c / x^2 * ((-1)^(n + 1) * (a / x)^n * (1 / (tmax + a / x) -
+      1 / (tmin + a / x)) + n * (-1)^(n - 1) * (a / x)^(n - 1) *
+      Log[(tmax + a / x) / (tmin + a / x)] + Sum[Binomial[n, k] * (-1)^k * (a / x)^k *
+      (((tmax + a / x)^(n - k - 1) - (tmin + a / x)^(n - k - 1)) / (n - k - 1)),
+    {k, 0, n - 2}]) /; n > 1 && FreeQ[c, t] && UnsameQ[x, 0],
+  (* t^n / (t+a) and n >= 1 *)
+  c_.t^n_ / (x_.t + a_) :> c / x * ((-(a / x))^n * Log[(tmax + a / x) / (tmin + a / x)] +
+      Sum[Binomial[n, k] * (-(a / x))^k * (((tmax + a / x)^(n - k) - (tmin + a / x)^(n - k)) / (n - k)),
+        {k, 0, n - 1}]) /; n > 0 && FreeQ[c, t] && UnsameQ[x, 0],
+
+  (** Special Case: n = 1 **)
+  (* t / (t+a)(t+b) *)
+  c_. t / ((x_.t + a_) * (y_.t + b_)) :> c / (x * y) * ((-(a / x) / (b / y - a / x)) * Log[(tmax + a / x) / (tmin + a / x)] -
+      (-(b / y) / (b / y - a / x)) * Log[(tmax + b / y) / (tmin + b / y)]) /;
+      a / x =!= b / y && FreeQ[c, t] && UnsameQ[x, 0] && UnsameQ[y, 0],
+  (* t / (t+a)^2 **)
+  c_. t / (x_.t + a_)^2 :> c / x * ((a / x) * (1 / (tmax + a / x) -
+      1 / (tmin + a / x)) + Log[(tmax + a / x) / (tmin + a / x)]) /; FreeQ[c, t] && UnsameQ[x, 0],
+  (* t / (t+a) *)
+  c_. t / (x_.t + a_) :> c / x * (-(a / x)) * Log[(tmax + a / x) / (tmin + a / x)] /; FreeQ[c, t] && UnsameQ[x, 0],
+
+  (** Special Case: n = 0 **)
+  (* 1 / (t+a)(t+b) *)
+  c_. 1 / ((x_.t + a_) * (y_.t + b_)) :> c / (x * y) * ((1 / (b / y - a / x)) * Log[(tmax + a / x) / (tmin + a / x)] -
+      (1 / (b / y - a / x)) * Log[(tmax + b / y) / (tmin + b / y)]) /; FreeQ[c, t] && UnsameQ[x, 0] && UnsameQ[y, 0],
+  (* 1 / (t+a)^2 *)
+  c_. 1 / (x_.t + a_)^2 :> c / x^2 * (-(1 / (tmax + a / x) - 1 / (tmin + a / x))) /; FreeQ[c, t] && UnsameQ[x, 0],
+  (* 1 / (t+a) *)
+  c_. 1 / (x_.t + a_) :> c / x * Log[(tmax + a / x) / (tmin + a / x)] /; FreeQ[c, t] && UnsameQ[x, 0],
+
+  (* No match, just integrate *)
+  a__ :> Integrate[a, {t, tmin, tmax}, GenerateConditions -> False]
+};
+
+CrossSectionIntegrate[exp_, {t_, tmin_, tmax_}] := Module[{integral},
+  (* expand out and group terms into list *)
+  integral = List @@ Expand[exp];
+  (* factor the denominators *)
+  integral = Map[Factor[#, GaussianIntegers -> True] &, integral];
+  (* replace terms we know with their integrations *)
+  integral = Map[ReplaceAll[#, IntegralTable[t, tmin, tmax]] &, integral];
+  Together[Total[integral]]
+];
 
 Options[HazmaComputeCrossSection22] := {
   FeynArts`Adjacencies -> {3, 4, 5},
@@ -70,8 +125,8 @@ HazmaComputeCrossSection22[inStates_, outStates_, Q_, OptionsPattern[]] := Modul
   tmax = Simplify[m1^2 + m3^2 - 2E1 * E3 + 2 * pi * pf];
   tmin = Simplify[m1^2 + m3^2 - 2E1 * E3 - 2 * pi * pf];
 
-  ReplaceAll[preFactor * Integrate[msqrd, {t, tmin, tmax}, GenerateConditions -> False], {s -> Q^2}]
 
+  ReplaceAll[preFactor * Integrate[msqrd, {t, tmin, tmax}, GenerateConditions -> False], {s -> Q^2}]
 ];
 
 Options[HazmaComputeCrossSection22TimesVelocity] := {
@@ -138,7 +193,54 @@ HazmaComputeCrossSection22TimesVelocity[inState_, outStates_, OptionsPattern[]] 
 
 ];
 
-End[];
+Options[HazmaComputeCrossSection] := {
+  FeynArts`Adjacencies -> {3, 4, 5},
+  FeynArts`ExcludeParticles -> {},
+  FeynArts`InsertionLevel -> {FeynArts`Particles},
+  FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
+  FeynArts`Paint -> False,
+  FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
+  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`SMP -> True
+};
 
+HazmaComputeCrossSection[inStates_, outStates_, Q_, OptionsPattern[]] := Module[{msqrd, p1, p2, p3, p4, m1, m2, m3, m4, s, t, u, preFactor, tmin, tmax},
+  ClearScalarProducts[];
+  (* Create the amplitude *)
+  msqrd = HazmaComputeAmplitudeSquared[
+    inStates,
+    outStates,
+    FeynArts`Adjacencies -> OptionValue[FeynArts`Adjacencies],
+    FeynArts`ExcludeParticles -> OptionValue[FeynArts`ExcludeParticles],
+    FeynArts`InsertionLevel -> OptionValue[FeynArts`InsertionLevel],
+    FeynArts`Paint -> OptionValue[FeynArts`Paint],
+    FeynArts`ColumnsXRows -> OptionValue[FeynArts`ColumnsXRows],
+    FeynArts`GaugeRules -> OptionValue[FeynArts`GaugeRules],
+    FeynCalc`FinalSubstitutions -> OptionValue[FeynCalc`FinalSubstitutions],
+    FeynCalc`IncomingMomenta -> {p1, p2},
+    FeynCalc`OutgoingMomenta -> {p3, p4},
+    FeynCalc`SMP -> OptionValue[FeynCalc`SMP]
+  ];
+
+  m1 = FeynArts`TheMass[inStates[[1]]];
+  m2 = FeynArts`TheMass[inStates[[2]]];
+  m3 = FeynArts`TheMass[outStates[[1]]];
+  m4 = FeynArts`TheMass[outStates[[2]]];
+
+  FeynCalc`SetMandelstam[s, t, u, p1, p2, -p3, -p4, m1, m2, m3, m4];
+  msqrd = Simplify[msqrd];
+  msqrd = ReplaceAll[msqrd, {u -> m1^2 + m2^2 + m3^2 + m4^2 - s - t}];
+
+  preFactor = 1 / (16 * Pi * KallenLambda[s, m1^2, m2^2]);
+  (* If final state particles are identical, divide by 2 *)
+  If[outStates[[1]] === outStates[[2]], preFactor = preFactor / 2, Continue];
+
+  tmin = m1^2 + m3^2 - (Sqrt[KallenLambda[s, m3^2, m4^2] * KallenLambda[s, m1^2, m2^2]] + (s + m1^2 - m2^2) * (s + m3^2 - m4^2)) / (2 * s);
+  tmax = m1^2 + m3^2 + (Sqrt[KallenLambda[s, m3^2, m4^2] * KallenLambda[s, m1^2, m2^2]] - (s + m1^2 - m2^2) * (s + m3^2 - m4^2)) / (2 * s);
+
+  ReplaceAll[preFactor * CrossSectionIntegrate[msqrd, {t, tmin, tmax}], {s -> Q^2}]
+];
+
+End[];
 
 EndPackage[]

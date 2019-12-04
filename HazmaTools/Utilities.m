@@ -47,6 +47,7 @@ HazmaSubstituteUnstableMediatorPropagator[exp_] := Module[{},
   If[$HazmaModel === "vector", Return[SubstituteUnstableVectorPropagator[exp]]];
   If[$HazmaModel === "SM", Return[exp]];
   If[$HazmaModel === "SMQCD", Return[exp]];
+  If[$HazmaModel === "Toy", Return[exp]];
   Message[HazmaSubstituteUnstableMediatorPropagator::InvalidModel, HazmaTools`$HazmaModel];
   Throw[$Failed]
 ];
@@ -56,6 +57,8 @@ ComputeMandelstamTBound[M_, m1_, m2_, m3_, s_, t_] := Module[{E1, E2},
   E2 = (M^2 + m2^2 - t) / (2 * M);
   Solve[M^2 + 2 * E1 * E2 + m1^2 + m2^2 - m3^2 - 2 * M * (E1 + E2) == 2Sqrt[(E1^2 - m1^2) * (E2^2 - m2^2)], t]
 ];
+
+KallenLambda[a_, b_, c_] := a^2 + b^2 + c^2 - 2 * (a * b + a * c + b * c);
 
 
 End[];

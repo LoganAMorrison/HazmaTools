@@ -1,6 +1,15 @@
 dev
 .idea
-.DS_Store
-.project
+*.DS_Store
+*.project
 docbuild.xml
 HazmaTools.iml
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.tex
+settings
+figures

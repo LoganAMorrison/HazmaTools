@@ -23,6 +23,7 @@ GetModelName[] := Module[{},
   If[$HazmaModel === "vector", Return[{"EFT_MeV_DM_vector_no_contact" <> "/" <> "EFT_MeV_DM_vector_no_contact"}]];
   If[$HazmaModel === "SM", Return["SM"]]; (*for testing*)
   If[$HazmaModel === "SMQCD", Return["SMQCD"]]; (*for testing*)
+  If[$HazmaModel === "Toy", Return[{"HazmaSpectraTutorialModel" <> "/" <> "HazmaSpectraTutorialModel"}]]; (*for testing*)
   Throw[$Failed, Abort::InvalidHazmaModel]
 ];
 
@@ -32,6 +33,7 @@ GetGenericModelName[] := Module[{},
   If[$HazmaModel === "vector", Return[{"Lorentz", "EFT_MeV_DM_vector_no_contact" <> "/" <> "EFT_MeV_DM_vector_no_contact"}]];
   If[$HazmaModel === "SM", Return[OptionValue[FeynArts`InsertFields, FeynArts`GenericModel]]]; (*for testing*)
   If[$HazmaModel === "SMQCD", Return[OptionValue[FeynArts`InsertFields, FeynArts`GenericModel]]]; (*for testing*)
+  If[$HazmaModel === "Toy", Return[{"Lorentz", "HazmaSpectraTutorialModel" <> "/" <> "HazmaSpectraTutorialModel"}]]; (*for testing*)
   Throw[$Failed, Abort::InvalidHazmaModel]
 ];
 
