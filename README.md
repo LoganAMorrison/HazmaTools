@@ -97,6 +97,8 @@ GhostWBosonM/AntiGhostWBosonM
 GhostWBosonP/AntiGhostWBosonP
 ```
 
+### Computing Amplitudes
+
 To compute an amplitude (or squared amplitude), run:
 
 ```mathematica
@@ -104,18 +106,21 @@ HazmaComputeAmplitude[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton}, Incomi
 HazmaComputeAmplitudeSquared[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton}, IncomingMomenta -> {px, pxbar}, OutgoingMomenta -> {pl, plbar}]
 ```
 
+### Computing Cross-Sections
 To compute a 2->2 cross section, use:
 
 ```mathematica
 HazmaComputeCrossSection22[{DarkMatter, AntiDarkMatter}, {Lepton, AntiLepton}, Q]
 ```
 
+### Computing Widths
 To compute a 1->2 width, use:
 
 ```mathematica
 HazmaComputeWidth[ScalarMediator, {Lepton, AntiLepton}]
 ```
 
+### Computing Spectra
 To compute dNdE, use:
 
 ```mathematica
