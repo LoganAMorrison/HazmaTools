@@ -130,12 +130,12 @@ G[+1][s1 S[j1], s2 S[j2], s3 S[j3], s4 S[j4], s5 V[j5]].{FourVector[mom1, li5], 
 	 (* SSSV *)
 
 AnalyticalCoupling[s1 S[j1, mom1], s2 S[j2, mom2], s3 S[j3, mom3], s4 V[j4, mom4, {li4}] ] ==
-G[+1][s1 S[j1], s2 S[j2], s3 S[j3], s4 V[j4]].{FourVector[mom1, li4], FourVector[mom2, li4], FourVector[mom3, li4]},
+G[-1][s1 S[j1], s2 S[j2], s3 S[j3], s4 V[j4]].{FourVector[mom1, li4], FourVector[mom2, li4], 1, LeviCivita[FourVector[mom1], FourVector[mom2], FourVector[mom3], li4], FourVector[mom3, li4]},
 
 	 (* SSSVV *)
 
 AnalyticalCoupling[s1 S[j1, mom1], s2 S[j2, mom2], s3 S[j3, mom3], s4 V[j4, mom4, {li4}], s5 V[j5, mom5, {li5}] ] ==
-G[+1][s1 S[j1], s2 S[j2], s3 S[j3], s4 V[j4], s5 V[j5]].{MetricTensor[li4 ,li5 ]},
+G[-1][s1 S[j1], s2 S[j2], s3 S[j3], s4 V[j4], s5 V[j5]].{MetricTensor[li4 ,li5 ], LeviCivita[FourVector[mom1], FourVector[mom4], li4, li5], LeviCivita[FourVector[mom1], FourVector[mom5], li4, li5], LeviCivita[FourVector[mom2], FourVector[mom4], li4, li5], LeviCivita[FourVector[mom2], FourVector[mom5], li4, li5], LeviCivita[FourVector[mom3], FourVector[mom4], li4, li5], LeviCivita[FourVector[mom3], FourVector[mom5], li4, li5]},
 
 	 (* SSV *)
 
@@ -150,7 +150,7 @@ G[+1][s1 S[j1], s2 S[j2], s3 V[j3], s4 V[j4]].{MetricTensor[li3 ,li4 ]},
 	 (* SVV *)
 
 AnalyticalCoupling[s1 S[j1, mom1], s2 V[j2, mom2, {li2}], s3 V[j3, mom3, {li3}] ] ==
-G[+1][s1 S[j1], s2 V[j2], s3 V[j3]].{FourVector[mom2, li3]FourVector[mom3, li2], MetricTensor[li2 ,li3 ]ScalarProduct[mom2,mom3]}
+G[-1][s1 S[j1], s2 V[j2], s3 V[j3]].{FourVector[mom2, li3]FourVector[mom3, li2], MetricTensor[li2 ,li3 ]ScalarProduct[mom2,mom3], LeviCivita[FourVector[mom1], FourVector[mom2], li2, li3], LeviCivita[FourVector[mom1], FourVector[mom3], li2, li3]}
 }
 
 (* FlippingRules: the flipping rules determines how Dirac

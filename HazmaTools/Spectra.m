@@ -31,14 +31,13 @@ Options[HazmaComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynArts`ExcludeParticles -> {Photon}
 };
 
 HazmaComputeDNDE[inStates_List, outStates_List, Q_Symbol, opt : OptionsPattern[]] := Module[{},
-  If[$HazmaModel === "scalar", Return[ScalarMediatorComputeDNDE[inStates, outStates, Q, opt]]];
-  If[$HazmaModel === "vector", Return[VectorMediatorComputeDNDE[inStates, outStates, Q, opt]]];
-  If[$HazmaModel === "Toy", Return[ScalarMediatorComputeDNDE[inStates, outStates, Q, opt]]];
+  If[$HazmaModel === "HazmaScalar", Return[ScalarMediatorComputeDNDE[inStates, outStates, Q, opt]]];
+  If[$HazmaModel === "HazmaVector", Return[VectorMediatorComputeDNDE[inStates, outStates, Q, opt]]];
   Message[HazmaComputeDNDE::InvalidModel, $HazmaModel];
   Throw[$Failed]
 ];
@@ -48,8 +47,8 @@ HazmaComputeDNDE[outStates_List, OptionsPattern[]] := Module[{mediator, msqrd, w
     Message[HazmaComputeDNDE::InvaliedOutStates];
     Throw[$Failed]
   ];
-  If[$HazmaModel === "scalar", mediator = ScalarMediator];
-  If[$HazmaModel === "vector", mediator = VectorMediator];
+  If[$HazmaModel === "HazmaScalar", mediator = ScalarMediator];
+  If[$HazmaModel === "HazmaVector", mediator = VectorMediator];
 
   (* Compute tree-level width *)
   width = HazmaComputeWidth[
@@ -102,7 +101,7 @@ Options[ScalarMediatorComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynArts`ExcludeParticles -> {Photon}
 };
 
@@ -144,17 +143,7 @@ ScalarMediatorComputeDNDE[inStates_List, outStates_List, Q_Symbol, OptionsPatter
     FeynCalc`OutgoingMomenta -> {p3, p4, k},
     FeynCalc`SMP -> True
   ];
-  (*
-  Set the Mandelstam variables:
-    s = (P - k)^2 = (p3 + p4)^2 = m3^2 + m4^2 + 2p3.p4
-      => p3.p4 = (1/2)(s - m3^2 - m4^2)
-    t = (P - p3)^2 = (p4 + k)^2 = m4^2 + 2k.p4
-      => k.p4 = (1/2)(t - m4^2)
-    u = (P - p4)^2 = (p3 + k)^2 = m3^2 + 2p3.k
-      => k.p3 = (1/2)(u - m3^2)
-    Q^2 = (p1 + p2)^2 = m1^2 + m2^2 + 2p1.p2
-      => p1.p2 = (1/2)(Q^2 - m1^2 - m2^2)
-  *)
+
   FeynCalc`SP[p3, p4] = (1 / 2) * (s - m3^2 - m4^2);
   FeynCalc`SP[k, p4] = (1 / 2) * (t - m4^2);
   FeynCalc`SP[k, p3] = (1 / 2) * (u - m3^2);
@@ -168,25 +157,6 @@ ScalarMediatorComputeDNDE[inStates_List, outStates_List, Q_Symbol, OptionsPatter
   tintegral = Integrate[msqrd, t, GenerateConditions -> False];
   tintegral = Simplify[(tintegral /. tub) - (tintegral /. tlb), Assumptions -> {Q > 0, Q > m1 + m2 > 0, Q > m3 + m4 > 0}];
 
-  (*
-  Compute the prefactor of dNdE:
-  The differential cross section we have is in terms of s and t:
-    \[DifferentialD]\[Sigma] = 1/(2E1*2E2*vrel) * M^2 * \[DifferentialD]\[CapitalPi]
-  where \[DifferentialD]\[CapitalPi] is:
-    \[DifferentialD]\[CapitalPi] = \[DifferentialD]s*\[DifferentialD]t / (16*Q^2(2*Pi)^3)
-  Using:
-    vrel = p/E1 + p/E2 = p(E1+E2)/(E1*E2) = p Q/(E1*E2)
-  and
-    p = Sqrt[E1^2-m1^2], E1=(Q^2+m1^2-m2^2)/(2Q);
-  we find that:
-    \[DifferentialD]\[Sigma] = 1/(4*p*Q) * M^2 * \[DifferentialD]s*\[DifferentialD]t / (16*Q^2(2*Pi)^3)
-  Integrating over t, we find:
-    \[DifferentialD]\[Sigma]/\[DifferentialD]s = 1/(4*p*Q*16*Q^2(2*Pi)^3)\[Integral] \[DifferentialD]t*M^2
-  To convert to \[DifferentialD]\[Sigma]/\[DifferentialD]E, we use:
-    \[DifferentialD]s/\[DifferentialD]E = \[DifferentialD]/\[DifferentialD]E (Q^2-2QE) = -2Q
-  Thus:
-    \[DifferentialD]\[Sigma]/\[DifferentialD]E = (-2Q)/(4*p*Q*16*Q^2(2*Pi)^3)\[Integral] \[DifferentialD]t*M^2
-  *)
   p = Sqrt[(m1 - m2 - Q) * (m1 + m2 - Q) * (m1 - m2 + Q) * (m1 + m2 + Q)] / (2 * Q);
   preFactor = -(2 * Q) / (4 * Q * p) * 1 / (16 * Q^2 * (2 * Pi)^3) * 1 / \[Sigma]0;
   dndE = tintegral * preFactor;
@@ -201,7 +171,7 @@ Options[VectorMediatorComputeDNDE] := {
   FeynArts`Adjacencies -> {3, 4, 5},
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynArts`ExcludeParticles -> {Photon}
 };
 
@@ -284,17 +254,6 @@ VectorMediatorComputeDNDE[inStates_List, outStates_List, Q_Symbol, OptionsPatter
   (* Compute M^2 = L\[Mu]\[Nu]X\[Mu]\[Nu] = 3Q^2 X L and add vector propagator *)
   msqrd = X * L (3 * Q^4) / ((Q^2 - Global`mv^2)^2 + (Global`mv * Global`widthv)^2);
 
-  (*
-  Set the Mandelstam variables:
-    s = (P - k)^2 = (p3 + p4)^2 = m3^2 + m4^2 + 2p3.p4
-      => p3.p4 = (1/2)(s - m3^2 - m4^2)
-    t = (P - p3)^2 = (p4 + k)^2 = m4^2 + 2k.p4
-      => k.p4 = (1/2)(t - m4^2)
-    u = (P - p4)^2 = (p3 + k)^2 = m3^2 + 2p3.k
-      => k.p3 = (1/2)(u - m3^2)
-    Q^2 = (p1 + p2)^2 = m1^2 + m2^2 + 2p1.p2
-      => p1.p2 = (1/2)(Q^2 - m1^2 - m2^2)
-  *)
   FeynCalc`SP[p3, p4] = (1 / 2) * (s - m3^2 - m4^2);
   FeynCalc`SP[k, p4] = (1 / 2) * (t - m4^2);
   FeynCalc`SP[k, p3] = (1 / 2) * (u - m3^2);
@@ -308,25 +267,6 @@ VectorMediatorComputeDNDE[inStates_List, outStates_List, Q_Symbol, OptionsPatter
   tintegral = Integrate[msqrd, t, GenerateConditions -> False];
   tintegral = Simplify[(tintegral /. tub) - (tintegral /. tlb), Assumptions -> {Q > 0, Q > m1 + m2 > 0, Q > m3 + m4 > 0}];
 
-  (*
-  Compute the prefactor of dNdE:
-  The differential cross section we have is in terms of s and t:
-    \[DifferentialD]\[Sigma] = 1/(2E1*2E2*vrel) * M^2 * \[DifferentialD]\[CapitalPi]
-  where \[DifferentialD]\[CapitalPi] is:
-    \[DifferentialD]\[CapitalPi] = \[DifferentialD]s*\[DifferentialD]t / (16*Q^2(2*Pi)^3)
-  Using:
-    vrel = p/E1 + p/E2 = p(E1+E2)/(E1*E2) = p Q/(E1*E2)
-  and
-    p = Sqrt[E1^2-m1^2], E1=(Q^2+m1^2-m2^2)/(2Q);
-  we find that:
-    \[DifferentialD]\[Sigma] = 1/(4*p*Q) * M^2 * \[DifferentialD]s*\[DifferentialD]t / (16*Q^2(2*Pi)^3)
-  Integrating over t, we find:
-    \[DifferentialD]\[Sigma]/\[DifferentialD]s = 1/(4*p*Q*16*Q^2(2*Pi)^3)\[Integral] \[DifferentialD]t*M^2
-  To convert to \[DifferentialD]\[Sigma]/\[DifferentialD]E, we use:
-    \[DifferentialD]s/\[DifferentialD]E = \[DifferentialD]/\[DifferentialD]E (Q^2-2QE) = -2Q
-  Thus:
-    \[DifferentialD]\[Sigma]/\[DifferentialD]E = (-2Q)/(4*p*Q*16*Q^2(2*Pi)^3)\[Integral] \[DifferentialD]t*M^2
-  *)
   p = Sqrt[(m1 - m2 - Q) * (m1 + m2 - Q) * (m1 - m2 + Q) * (m1 + m2 + Q)] / (2 * Q);
   preFactor = -(2 * Q) / (4 * Q * p) * 1 / (16 * Q^2 * (2 * Pi)^3) * 1 / \[Sigma]0;
   dndE = tintegral * preFactor;

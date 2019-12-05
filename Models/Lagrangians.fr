@@ -7,7 +7,7 @@ Lagrangian := Module[{lag},
   If[$IncludeScalarMediator, lag += LScalar];
   If[$IncludeVectorMediator, lag += LVector];
   If[$IncludeAxialVectorMediator, lag += LAxialVector];
-  lag
+  Normal[Series[lag, {GF, 0, 1}]]
 ];
 
 (*
@@ -86,7 +86,7 @@ LChiPTContactRho := Block[{m, n},
 ];
 
 (* NOTE: Not including rho *)
-LChiPT := Normal[Series[LChiPTKinetic + LChiPTMass + LChiPTWessZuminoWitten, {GF, 0, 1}]];
+LChiPT := LChiPTKinetic + LChiPTMass + LChiPTWessZuminoWitten;
 
 
 (*

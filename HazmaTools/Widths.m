@@ -33,7 +33,7 @@ Options[HazmaComputeWidth] = {
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynCalc`ChangeDimension -> 4,
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`SMP -> True
 };
 
@@ -59,7 +59,7 @@ Options[HazmaComputeWidth12] = {
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynCalc`ChangeDimension -> 4,
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`SMP -> True
 };
 
@@ -116,7 +116,7 @@ Options[HazmaComputeWidth13] := {
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynCalc`ChangeDimension -> 4,
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`SMP -> True
 };
 

@@ -25,7 +25,7 @@ the Mandelstam variable t = (P-p2)^2 where p2 is the four-momentum associated wi
 
 Begin["`Private`"];
 
-$HazmaModel = "scalar";
+$HazmaModel = "HazmaScalar";
 
 SubstituteUnstableScalarPropagator[exp_] := ReplaceAll[exp, {
   FeynCalc`FeynAmpDenominator[FeynCalc`PropagatorDenominator[a__FeynCalc`Momentum + b__FeynCalc`Momentum, Global`ms]] :> 1 / (FeynCalc`SP[a + b, a + b] - Global`ms^2 + I Global`widths Global`ms),
@@ -39,17 +39,10 @@ SubstituteUnstableVectorPropagator[exp_] := ReplaceAll[exp, {
   FeynCalc`FeynAmpDenominator[FeynCalc`PropagatorDenominator[a__FeynCalc`Momentum, Global`mv]] :> 1 / (FeynCalc`SP[a, a] - Global`mv^2 + I Global`widthv Global`mv)}
 ];
 
-HazmaSubstituteUnstableMediatorPropagator::InvalidModel = "HazmaSubstituteUnstableMediatorPropagator[exp]\
- not implemented for model: `1.";
-
 HazmaSubstituteUnstableMediatorPropagator[exp_] := Module[{},
-  If[$HazmaModel === "scalar", Return[SubstituteUnstableScalarPropagator[exp]]];
-  If[$HazmaModel === "vector", Return[SubstituteUnstableVectorPropagator[exp]]];
-  If[$HazmaModel === "SM", Return[exp]];
-  If[$HazmaModel === "SMQCD", Return[exp]];
-  If[$HazmaModel === "Toy", Return[exp]];
-  Message[HazmaSubstituteUnstableMediatorPropagator::InvalidModel, HazmaTools`$HazmaModel];
-  Throw[$Failed]
+  If[$HazmaModel === "HazmaScalar", Return[SubstituteUnstableScalarPropagator[exp]]];
+  If[$HazmaModel === "HazmaVector", Return[SubstituteUnstableVectorPropagator[exp]]];
+  Return[exp]
 ];
 
 ComputeMandelstamTBound[M_, m1_, m2_, m3_, s_, t_] := Module[{E1, E2},

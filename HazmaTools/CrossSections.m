@@ -14,8 +14,10 @@
 BeginPackage["HazmaTools`"];
 
 HazmaComputeCrossSection22::usage = "HazmaComputeCrossSection22[]";
-HazmaComputeCrossSection::usage = "HazmaComputeCrossSection[]";
 HazmaComputeCrossSection22TimesVelocity::usage = "HazmaComputeCrossSection22TimesVelocity[]";
+(* Needs work.
+  HazmaComputeCrossSection::usage = "HazmaComputeCrossSection[]";
+*)
 
 Begin["`Private`"];
 
@@ -81,7 +83,7 @@ Options[HazmaComputeCrossSection22] := {
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`SMP -> True
 };
 
@@ -138,7 +140,7 @@ Options[HazmaComputeCrossSection22TimesVelocity] := {
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`ChangeDimension -> 4,
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`SMP -> True
 };
 
@@ -200,7 +202,7 @@ Options[HazmaComputeCrossSection] := {
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`SMP -> True
 };
 

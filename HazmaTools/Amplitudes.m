@@ -31,7 +31,7 @@ Options[HazmaComputeAmplitude] := {
   FeynArts`Paint -> False,
   FeynArts`ColumnsXRows -> OptionValue[FeynArts`Paint, FeynArts`ColumnsXRows],
   FeynCalc`ChangeDimension -> 4,
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`IncomingMomenta -> OptionValue[FeynCalc`FCFAConvert, FeynCalc`IncomingMomenta],
   System`List -> False,
   FeynCalc`LoopMomenta -> OptionValue[FeynCalc`FCFAConvert, FeynCalc`LoopMomenta],
@@ -40,7 +40,7 @@ Options[HazmaComputeAmplitude] := {
   FeynCalc`SMP -> True,
   FeynCalc`TransversePolarizationVectors -> OptionValue[FeynCalc`FCFAConvert, FeynCalc`TransversePolarizationVectors],
   FeynArts`GaugeRules -> OptionValue[FeynArts`CreateFeynAmp, FeynArts`GaugeRules],
-  FeynArts`PreFactor -> OptionValue[FeynArts`CreateFeynAmp,FeynArts`PreFactor],
+  FeynArts`PreFactor -> OptionValue[FeynArts`CreateFeynAmp, FeynArts`PreFactor],
   FeynArts`Truncated -> OptionValue[FeynArts`CreateFeynAmp, FeynArts`Truncated]
 };
 
@@ -102,7 +102,7 @@ Options[HazmaComputeAmplitudeSquared] := {
   FeynArts`GaugeRules -> _FeynArts`FAGaugeXi -> 1,
   FeynArts`PreFactor -> -I (2 \[Pi])^(-4 FeynArts`LoopNumber),
   FeynCalc`ChangeDimension -> 4,
-  FeynCalc`FinalSubstitutions -> If[MemberQ[{"scalar", "vector"}, $HazmaModel], {Global`M$FACouplings}, {}],
+  FeynCalc`FinalSubstitutions -> {},
   FeynCalc`IncomingMomenta -> {},
   FeynCalc`OutgoingMomenta -> {},
   FeynCalc`SMP -> True

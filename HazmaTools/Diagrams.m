@@ -18,25 +18,41 @@ associated with the process inStates->outStates.";
 
 Begin["`Private`"];
 
-GetModelName[] := Module[{},
-  If[$HazmaModel === "scalar", Return[{"EFT_MeV_DM_scalar" <> "/" <> "EFT_MeV_DM_scalar"}]];
-  If[$HazmaModel === "vector", Return[{"EFT_MeV_DM_vector_no_contact" <> "/" <> "EFT_MeV_DM_vector_no_contact"}]];
-  If[$HazmaModel === "SM", Return["SM"]]; (*for testing*)
-  If[$HazmaModel === "SMQCD", Return["SMQCD"]]; (*for testing*)
-  If[$HazmaModel === "Toy", Return[{"HazmaSpectraTutorialModel" <> "/" <> "HazmaSpectraTutorialModel"}]]; (*for testing*)
-  Throw[$Failed, Abort::InvalidHazmaModel]
+GetModelName::InvalidModel = "Invalid model: `1`.";
+
+GetModelName[] := Module[{dir, type, model},
+  model = None;
+  dir = Directory[];
+  SetDirectory[FileNameJoin[{$UserBaseDirectory, "Applications", "FeynCalc", "FeynArts", "Models"}]];
+  (* If model is a directory, need to use $HazmaModel/$HazmaModel *)
+  type = FileType[$HazmaModel];
+  If[SameQ[type, Directory], model = {FileNameJoin[{$HazmaModel, $HazmaModel}]}];
+  (* If there is a bare .mod file, we just use defaults *)
+  type = FileType[$HazmaModel <> ".mod"];
+  If[SameQ[type, File], model = $HazmaModel];
+  (* If gmodel is None, no model was found *)
+  If[UnsameQ[model, None],
+    SetDirectory[dir]; Return[model],
+    Message[GetModelName::InvalidModel, $HazmaModel]; $Failed
+  ]
 ];
 
-
-GetGenericModelName[] := Module[{},
-  If[$HazmaModel === "scalar", Return[{"Lorentz", "EFT_MeV_DM_scalar" <> "/" <> "EFT_MeV_DM_scalar"}]];
-  If[$HazmaModel === "vector", Return[{"Lorentz", "EFT_MeV_DM_vector_no_contact" <> "/" <> "EFT_MeV_DM_vector_no_contact"}]];
-  If[$HazmaModel === "SM", Return[OptionValue[FeynArts`InsertFields, FeynArts`GenericModel]]]; (*for testing*)
-  If[$HazmaModel === "SMQCD", Return[OptionValue[FeynArts`InsertFields, FeynArts`GenericModel]]]; (*for testing*)
-  If[$HazmaModel === "Toy", Return[{"Lorentz", "HazmaSpectraTutorialModel" <> "/" <> "HazmaSpectraTutorialModel"}]]; (*for testing*)
-  Throw[$Failed, Abort::InvalidHazmaModel]
+GetGenericModelName[] := Module[{dir, type, gmodel},
+  gmodel = None;
+  dir = Directory[];
+  SetDirectory[FileNameJoin[{$UserBaseDirectory, "Applications", "FeynCalc", "FeynArts", "Models"}]];
+  (* If model is a directory, need to add Lorentz and $HazmaModel/$HazmaModel *)
+  type = FileType[$HazmaModel];
+  If[SameQ[type, Directory], gmodel = {"Lorentz", FileNameJoin[{$HazmaModel, $HazmaModel}]}];
+  (* If there is a bare .mod file, we just use defaults *)
+  type = FileType[$HazmaModel <> ".mod"];
+  If[SameQ[type, File], gmodel = Return[OptionValue[FeynArts`InsertFields, FeynArts`GenericModel]]];
+  (* If gmodel is None, no model was found *)
+  If[UnsameQ[gmodel, None],
+    SetDirectory[dir]; Return[gmodel],
+    Message[GetModelName::InvalidModel, $HazmaModel]; $Failed
+  ]
 ];
-
 
 Options[HazmaGenerateDiagrams] = {
   FeynArts`LoopNumber -> 0,
